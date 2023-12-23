@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration;
 /**
  * PropertyConfig should be imported if any property intended to use, <a href="https://github.com/spring-projects/spring-boot/issues/36175">look for more</a>
  */
-/*@Configuration
+@Configuration
 @EnableConfigurationProperties({
         JwtProperties.class,
         MongoApplicationProperties.class,
-})*/
+})
 public class PropertyConfig {
 }
