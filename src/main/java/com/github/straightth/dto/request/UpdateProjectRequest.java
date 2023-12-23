@@ -1,10 +1,5 @@
 package com.github.straightth.dto.request;
 
-import static com.github.straightth.util.Constants.Project.DESCRIPTION_MAX_LENGTH;
-import static com.github.straightth.util.Constants.Project.DESCRIPTION_MIN_LENGTH;
-import static com.github.straightth.util.Constants.Project.NAME_MAX_LENGTH;
-import static com.github.straightth.util.Constants.Project.NAME_MIN_LENGTH;
-
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Size;
 import java.util.Collection;
@@ -17,24 +12,12 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class UpdateProjectRequest {
 
-    @Size(
-            min = NAME_MIN_LENGTH,
-            max = NAME_MAX_LENGTH,
-            message = "Project name should be between "
-                    + NAME_MIN_LENGTH + " and "
-                    + NAME_MAX_LENGTH + " characters"
-    )
+    @Size(min = 1, max = 30, message = "{taskl.error.project.name-length}")
     @Nullable
     @Builder.Default
     String name = null;
 
-    @Size(
-            min = DESCRIPTION_MIN_LENGTH,
-            max = DESCRIPTION_MAX_LENGTH,
-            message = "Project description should be between "
-                    + DESCRIPTION_MIN_LENGTH + " and "
-                    + DESCRIPTION_MAX_LENGTH + " characters"
-    )
+    @Size(min = 1, max = 300, message = "{taskl.error.project.description-length}")
     @Nullable
     @Builder.Default
     String description = null;

@@ -16,7 +16,6 @@ import com.github.straightth.dto.request.CreateProjectRequest;
 import com.github.straightth.dto.request.UpdateProjectRequest;
 import com.github.straightth.repository.ProjectRepository;
 import com.github.straightth.repository.UserRepository;
-import com.github.straightth.util.Constants;
 import com.github.straightth.util.SecurityUtil;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-//TODO: refactor it after error factory
 public class ProjectControllerTest extends MockMvcAbstractTest {
 
     private static final String RANDOM_UUID = UUID.randomUUID().toString();
@@ -94,8 +92,8 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
             var mockUserId = SecurityUtil.getCurrentUserId();
 
             var expectedProject = Project.builder()
-                    .name(Constants.Project.DEFAULT_NAME)
-                    .description(Constants.Project.DEFAULT_DESCRIPTION)
+                    .name("New project")
+                    .description("You can fill your description here")
                     .memberUserIds(List.of(mockUserId))
                     .build();
 
@@ -106,8 +104,8 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
             // Assert
             result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name").value(Constants.Project.DEFAULT_NAME))
-                    .andExpect(jsonPath("$.description").value(Constants.Project.DEFAULT_DESCRIPTION))
+                    .andExpect(jsonPath("$.name").value("New project"))
+                    .andExpect(jsonPath("$.description").value("You can fill your description here"))
                     .andExpect(jsonPath("$.memberUsers[0].id").value(mockUserId));
 
             var actualProject = projectRepository.findAll().getFirst();
@@ -159,7 +157,6 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
                     // Assert
                     result.andExpect(status().isBadRequest())
-                            //TODO validation message
                             .andExpect(jsonPath("$.message").value("must not be null"));
                 }
 
@@ -206,7 +203,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 public void nameEqualToLimitLeadsTo200() throws Exception {
                     // Arrange
                     var request = CreateProjectRequest.builder()
-                            .name(StringUtils.repeat("*", Constants.Project.NAME_MAX_LENGTH + 1))
+                            .name(StringUtils.repeat("*", 30))
                             .build();
 
                     // Act
@@ -216,9 +213,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                     );
 
                     // Assert
-                    result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message")
-                                    .value("Project name should be between 1 and 30 characters"));
+                    result.andExpect(status().isOk());
                 }
 
                 @Test
@@ -226,7 +221,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 public void nameLongerThanLimitLeadsTo400() throws Exception {
                     // Arrange
                     var request = CreateProjectRequest.builder()
-                            .name(StringUtils.repeat("*", Constants.Project.NAME_MAX_LENGTH + 1))
+                            .name(StringUtils.repeat("*", 31))
                             .build();
 
                     // Act
@@ -262,7 +257,6 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
                     // Assert
                     result.andExpect(status().isBadRequest())
-                            //TODO validation message
                             .andExpect(jsonPath("$.message").value("must not be null"));
                 }
 
@@ -289,7 +283,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 public void descriptionEqualToLimitLeadsTo200() throws Exception {
                     // Arrange
                     var request = CreateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", Constants.Project.DESCRIPTION_MAX_LENGTH))
+                            .description(StringUtils.repeat("*", 300))
                             .build();
 
                     // Act
@@ -307,7 +301,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 public void descriptionLongerThanLimitLeadsTo400() throws Exception {
                     // Arrange
                     var request = CreateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", Constants.Project.DESCRIPTION_MAX_LENGTH + 1))
+                            .description(StringUtils.repeat("*", 301))
                             .build();
 
                     // Act
@@ -701,7 +695,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                     });
 
                     var request = UpdateProjectRequest.builder()
-                            .name(StringUtils.repeat("*", Constants.Project.NAME_MAX_LENGTH + 1))
+                            .name(StringUtils.repeat("*", 30))
                             .build();
 
                     // Act
@@ -711,9 +705,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                     );
 
                     // Assert
-                    result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message")
-                                    .value("Project name should be between 1 and 30 characters"));
+                    result.andExpect(status().isOk());
                 }
 
                 @Test
@@ -726,7 +718,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                     });
 
                     var request = UpdateProjectRequest.builder()
-                            .name(StringUtils.repeat("*", Constants.Project.NAME_MAX_LENGTH + 1))
+                            .name(StringUtils.repeat("*", 31))
                             .build();
 
                     // Act
@@ -778,7 +770,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                     });
 
                     var request = UpdateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", Constants.Project.DESCRIPTION_MAX_LENGTH))
+                            .description(StringUtils.repeat("*", 300))
                             .build();
 
                     // Act
@@ -801,7 +793,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                     });
 
                     var request = UpdateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", Constants.Project.DESCRIPTION_MAX_LENGTH + 1))
+                            .description(StringUtils.repeat("*", 301))
                             .build();
 
                     // Act
@@ -821,8 +813,8 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
     private String createProject(Consumer<Project> preconfigure) {
         var project = Project.builder()
-                .name(Constants.Project.DEFAULT_NAME)
-                .description(Constants.Project.DEFAULT_DESCRIPTION)
+                .name("Test name")
+                .description("Test description")
                 .memberUserIds(List.of(getCurrentUserId()))
                 .build();
         preconfigure.accept(project);

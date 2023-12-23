@@ -1,9 +1,7 @@
 To-Do:
-- .gitignore
 - Tests (try to use JetBrains AI)
-- Some error factory
-- Rich README (metrics, overview, logic behind that, technologies, how to start, implementation details, document todo points)
 - Save password hash instead of password itself
+- Rich README (metrics, overview, logic behind that, technologies, how to start, implementation details, document todo points)
 - Generify not found exceptions: common superclass with single handle logic
 - Checkstyle
 - CI/CD
