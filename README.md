@@ -1,0 +1,24 @@
+To-Do:
+- .gitignore
+- Tests (try to use JetBrains AI)
+- Some error factory
+- Rich README (metrics, overview, logic behind that, technologies, how to start, implementation details, document todo points)
+- Save password hash instead of password itself
+- Generify not found exceptions: common superclass with single handle logic
+- Checkstyle
+- CI/CD
+- Docker Compose
+- Paging API
+- OpenAPI
+- Delete API
+- Transaction management and optimistic locking in Mongo
+- Filter and ordering for Tasks and Projects
+- Sonar
+- Actuator
+- DI through configuration classes
+- Make Spring Security config more concise
+- Lombok -> Kotlin
+- Rich error factory
+- Jakarta violation pretty response: https://blog.payara.fish/returning-beautiful-validation-error-messages-in-jakarta-rest-with-exception-mappers
+- Inspect how to pretty render ConstraintViolationException and null exception
+- Gather user statistics
