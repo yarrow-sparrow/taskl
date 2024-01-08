@@ -4,8 +4,7 @@ import com.github.straightth.domain.User;
 import com.github.straightth.dto.request.SignInRequest;
 import com.github.straightth.dto.request.SignUpRequest;
 import com.github.straightth.dto.response.AuthenticationResponse;
-import com.github.straightth.exception.authentication.IncorrectPassword;
-import com.github.straightth.exception.authentication.NoUserWithSuchEmail;
+import com.github.straightth.exception.ErrorFactory;
 import com.github.straightth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,7 @@ public class AuthenticationService {
 
     public void signUp(SignUpRequest request) {
         if (userRepository.existsUserByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("User with such email already exists");
+            throw ErrorFactory.get().userAlreadyExists();
         }
 
         var user = User.builder()
@@ -43,9 +42,9 @@ public class AuthenticationService {
         var email = request.getEmail();
         var password = request.getPassword();
 
-        var user = userRepository.findByEmail(email).orElseThrow(NoUserWithSuchEmail::new);
+        var user = userRepository.findByEmail(email).orElseThrow(ErrorFactory.get()::noUserWithSuchEmail);
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IncorrectPassword();
+            throw ErrorFactory.get().incorrectPassword();
         }
         authenticationManager.authenticate(authenticationToken(email, password));
         var jwt = jwtService.generateToken(user);

@@ -2,8 +2,8 @@ package com.github.straightth.dto.request;
 
 import com.github.straightth.domain.TaskStatus;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Min;
-import java.time.LocalDate;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -13,17 +13,21 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class UpdateTaskRequest {
 
+    @Size(min = 1, max = 30, message = "{taskl.validation.task.name-length}")
     @Nullable
     String name;
+
+    @Size(min = 1, max = 300, message = "{taskl.validation.task.description-length}")
     @Nullable
     String description;
+
     @Nullable
     TaskStatus status;
+
     @Nullable
     String assigneeUserId;
+
+    @PositiveOrZero
     @Nullable
-    @Min(0)
     Double storyPoints;
-    @Nullable
-    LocalDate deadline;
 }

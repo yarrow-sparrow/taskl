@@ -8,7 +8,6 @@ import java.util.Collection;
 
 public interface UserService {
 
-    Collection<UserShortResponse> getUsers();
     UserResponse getUserById(String userId);
     UserHimselfResponse getUserHimself();
     UserHimselfResponse updateUserHimself(UpdateUserHimselfRequest request);

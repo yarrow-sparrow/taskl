@@ -8,6 +8,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class AuthenticationResponse {
+
     String token;
     String userId;
 }

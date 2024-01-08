@@ -17,5 +17,6 @@ public class UserResponse {
     String telegram;
     String role;
     String phoneNumber;
+    //TODO: get rid of it
     Collection<ProjectShortResponse> mutualProjects;
 }

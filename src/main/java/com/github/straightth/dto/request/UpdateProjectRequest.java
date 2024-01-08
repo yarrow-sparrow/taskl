@@ -12,12 +12,12 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class UpdateProjectRequest {
 
-    @Size(min = 1, max = 30, message = "{taskl.error.project.name-length}")
+    @Size(min = 1, max = 30, message = "{taskl.validation.project.name-length}")
     @Nullable
     @Builder.Default
     String name = null;
 
-    @Size(min = 1, max = 300, message = "{taskl.error.project.description-length}")
+    @Size(min = 1, max = 300, message = "{taskl.validation.project.description-length}")
     @Nullable
     @Builder.Default
     String description = null;

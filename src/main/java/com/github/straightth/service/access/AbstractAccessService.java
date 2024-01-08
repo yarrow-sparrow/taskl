@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class AbstractAccessService<EntityT, IdT, NotFoundExceptionT extends IllegalArgumentException>
+public abstract class AbstractAccessService<EntityT, IdT, NotFoundExceptionT extends RuntimeException>
         implements AccessService<EntityT, IdT> {
 
     public abstract Function<Collection<IdT>, Collection<EntityT>> defaultAccessFunction();

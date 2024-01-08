@@ -1,27 +1,62 @@
 package com.github.straightth.service.task;
 
+import com.github.straightth.domain.Project;
 import com.github.straightth.domain.Task;
-import com.github.straightth.exception.task.TaskNotFound;
+import com.github.straightth.repository.ProjectRepository;
+import com.github.straightth.repository.TaskRepository;
 import com.github.straightth.service.access.AbstractAccessService;
+import com.github.straightth.exception.ApplicationError;
+import com.github.straightth.exception.ErrorFactory;
+import com.github.straightth.util.SecurityUtil;
+import com.google.common.collect.MultimapBuilder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public abstract class TaskAccessService extends AbstractAccessService<Task, String, TaskNotFound> {
+@Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class TaskAccessService extends AbstractAccessService<Task, String, ApplicationError> {
 
-    //TODO: we're considering our data consistent
-    /**
-     * Invalidating task's project id while finding it
-     * @param projectId projectId to invalidate
-     * @param taskId taskId to seek by
-     * @return task
-     */
-    public Task getPresentCheckingProjectOrThrow(String projectId, String taskId) {
-        var task = getPresentOrThrow(taskId);
-        if (!task.getProjectId().equals(projectId)) {
-            throw new TaskNotFound();
-        }
-        return task;
+    private final TaskRepository taskRepository;
+    private final ProjectRepository projectRepository;
+
+    @Override
+    public Function<Collection<String>, Collection<Task>> defaultAccessFunction() {
+        return taskRepository::findAllById;
     }
 
-    public void validatePresenceCheckingProjectOrThrow(String projectId, String taskId) {
-        getPresentCheckingProjectOrThrow(projectId, taskId);
+    @Override
+    public Function<Collection<String>, Collection<Task>> securedAccessFunction() {
+        return taskIds -> {
+            var tasks = taskRepository.findAllById(taskIds);
+            var tasksByProjectId = MultimapBuilder.hashKeys().arrayListValues().<String, Task>build();
+            tasks.forEach(t -> tasksByProjectId.put(t.getProjectId(), t));
+
+            var currentUserId = SecurityUtil.getCurrentUserId();
+            var accessibleProjects = projectRepository.findProjectsByIdInAndMemberUserIdsContains(
+                    tasksByProjectId.keySet(),
+                    currentUserId
+            );
+            var accessibleProjectIds = accessibleProjects.stream().map(Project::getId).collect(Collectors.toSet());
+
+            var accessibleTasks = new ArrayList<Task>();
+            for (var projectId : tasksByProjectId.keySet()) {
+                if (accessibleProjectIds.contains(projectId)) {
+                    accessibleTasks.addAll(tasksByProjectId.get(projectId));
+                }
+            }
+
+            return accessibleTasks;
+        };
+    }
+
+    @Override
+    public Supplier<ApplicationError> notFoundExceptionSupplier() {
+        return ErrorFactory.get()::taskNotFound;
     }
 }

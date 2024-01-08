@@ -7,8 +7,8 @@ import java.util.Collection;
 
 public interface TaskService {
 
-    TaskResponse createTask(String projectId, CreateTaskRequest request);
-    Collection<TaskResponse> getProjectTasks(String projectId);
-    TaskResponse getTaskById(String projectId, String taskId);
-    TaskResponse updateTaskById(String projectId, String taskId, UpdateTaskRequest request);
+    TaskResponse createTask(CreateTaskRequest request);
+    Collection<TaskResponse> getTasksByProjectId(String projectId);
+    TaskResponse getTaskById(String taskId);
+    TaskResponse updateTaskById(String taskId, UpdateTaskRequest request);
 }
