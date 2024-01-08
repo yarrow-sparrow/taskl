@@ -1,9 +1,10 @@
 package com.github.straightth.service.project;
 
 import com.github.straightth.domain.Project;
-import com.github.straightth.exception.project.ProjectNotFound;
 import com.github.straightth.repository.ProjectRepository;
 import com.github.straightth.service.access.AbstractAccessService;
+import com.github.straightth.exception.ApplicationError;
+import com.github.straightth.exception.ErrorFactory;
 import com.github.straightth.util.SecurityUtil;
 import java.util.Collection;
 import java.util.function.Function;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class ProjectAccessService extends AbstractAccessService<Project, String, ProjectNotFound> {
+public class ProjectAccessService extends AbstractAccessService<Project, String, ApplicationError> {
 
     private final ProjectRepository projectRepository;
 
@@ -32,7 +33,7 @@ public class ProjectAccessService extends AbstractAccessService<Project, String,
     }
 
     @Override
-    public Supplier<ProjectNotFound> notFoundExceptionSupplier() {
-        return ProjectNotFound::new;
+    public Supplier<ApplicationError> notFoundExceptionSupplier() {
+        return ErrorFactory.get()::projectNotFound;
     }
 }

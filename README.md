@@ -1,22 +1,16 @@
 To-Do:
-- Tests (try to use JetBrains AI)
-- Save password hash instead of password itself
-- Rich README (metrics, overview, logic behind that, technologies, how to start, implementation details, document todo points)
-- Generify not found exceptions: common superclass with single handle logic
-- Checkstyle
-- CI/CD
+- Controller tests (try to use JetBrains AI)
+- CI/CD: tests, checkstyle
+- Access services tests
 - Docker Compose
-- Paging API
+- Pageable API
+- Authentication tests
+- Generify not found exceptions: common superclass with single handle logic
 - OpenAPI
-- Delete API
-- Transaction management and optimistic locking in Mongo
-- Filter and ordering for Tasks and Projects
-- Sonar
-- Actuator
 - DI through configuration classes
+- Rich README (metrics, overview, logic behind that, technologies, how to start, implementation details, document todo points, describe why there is not unit-tests)
 - Make Spring Security config more concise
+- Optimistic locking in Mongo
 - Lombok -> Kotlin
-- Rich error factory
-- Jakarta violation pretty response: https://blog.payara.fish/returning-beautiful-validation-error-messages-in-jakarta-rest-with-exception-mappers
-- Inspect how to pretty render ConstraintViolationException and null exception
-- Gather user statistics
+- Jakarta violation response formatting: https://blog.payara.fish/returning-beautiful-validation-error-messages-in-jakarta-rest-with-exception-mappers
+- Prettify render of ConstraintViolationException and null exceptions

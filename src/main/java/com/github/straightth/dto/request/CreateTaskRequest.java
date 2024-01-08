@@ -3,8 +3,8 @@ package com.github.straightth.dto.request;
 import com.github.straightth.domain.TaskStatus;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import java.time.LocalDate;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -14,20 +14,27 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class CreateTaskRequest {
 
-    @NotEmpty
+    @NotNull
+    String projectId;
+
+    @Size(min = 1, max = 30, message = "{taskl.validation.task.name-length}")
+    @NotNull
     @Builder.Default
     String name = "New task";
-    @NotEmpty
+
+    @Size(min = 1, max = 300, message = "{taskl.validation.task.description-length}")
+    @NotNull
     @Builder.Default
-    String description = "Description of new task";
+    String description = "You can fill your description here";
+
     @NotNull
     @Builder.Default
     TaskStatus status = TaskStatus.BACKLOG;
+
     @Builder.Default
     String assigneeUserId = null;
-    @Positive
+
+    @PositiveOrZero
     @Builder.Default
-    Double storyPoints = 1d;
-    @Builder.Default
-    LocalDate deadline = LocalDate.now().plusDays(7);
+    Double storyPoints = 0d;
 }

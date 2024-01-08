@@ -33,7 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
         var memberUserIds = new ArrayList<>(request.getMemberUserIds());
         userPresenceService.validatePresenceOrThrow(memberUserIds);
 
-        // Adding user to created project
+        //Adding user to created project
         var currentUserId = SecurityUtil.getCurrentUserId();
         memberUserIds.add(currentUserId);
         project.setMemberUserIds(memberUserIds);
@@ -58,6 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public ProjectResponse updateProjectById(String projectId, UpdateProjectRequest request) {
+        //noinspection DuplicatedCode: similar fields and update approach with task
         var project = projectAccessService.getPresentOrThrowSecured(projectId);
 
         var name = request.getName();

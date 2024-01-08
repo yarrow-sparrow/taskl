@@ -1,7 +1,5 @@
 package com.github.straightth.domain;
 
-import java.time.LocalDate;
-import java.time.Period;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -22,10 +20,4 @@ public class Task {
     private String assigneeUserId;
     private TaskStatus status;
     private Double storyPoints;
-    private LocalDate deadline;
-
-    public Integer getDaysLeft() {
-        if (deadline == null) return null;
-        return Period.between(LocalDate.now(), deadline).getDays();
-    }
 }

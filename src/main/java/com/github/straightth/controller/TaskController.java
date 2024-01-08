@@ -14,44 +14,33 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * TODO:
- *  - move to root
- *  - make inaccessible for access other user's data
- */
 @RestController
-@RequestMapping("/v1/project/{projectId}/task")
+@RequestMapping("/v1/task")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class TaskController {
 
     private final TaskService taskService;
 
     @PostMapping
-    public TaskResponse createTask(
-            @PathVariable String projectId,
-            @RequestBody @Valid CreateTaskRequest task
-    ) {
-        return taskService.createTask(projectId, task);
+    public TaskResponse createTask(@RequestBody @Valid CreateTaskRequest task) {
+        return taskService.createTask(task);
     }
 
     @GetMapping
-    public Collection<TaskResponse> getTasksByProjectId(@PathVariable String projectId) {
-        return taskService.getProjectTasks(projectId);
+    public Collection<TaskResponse> getTasks(@RequestParam String projectId) {
+        return taskService.getTasksByProjectId(projectId);
     }
 
     @GetMapping("/{taskId}")
-    public TaskResponse getTaskById(@PathVariable String projectId, @PathVariable String taskId) {
-        return taskService.getTaskById(projectId, taskId);
+    public TaskResponse getTaskById(@PathVariable String taskId) {
+        return taskService.getTaskById(taskId);
     }
 
     @PutMapping("/{taskId}")
-    public TaskResponse updateTaskById(
-            @PathVariable String projectId,
-            @PathVariable String taskId,
-            @RequestBody @Valid UpdateTaskRequest request
-    ) {
-        return taskService.updateTaskById(projectId, taskId, request);
+    public TaskResponse updateTaskById(@PathVariable String taskId, @RequestBody @Valid UpdateTaskRequest request) {
+        return taskService.updateTaskById(taskId, request);
     }
 }
