@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-//TODO: test cases
 public class ProjectControllerTest extends MockMvcAbstractTest {
 
     private static final String RANDOM_UUID = UUID.randomUUID().toString();

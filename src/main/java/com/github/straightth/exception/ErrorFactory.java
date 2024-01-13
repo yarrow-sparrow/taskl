@@ -21,14 +21,6 @@ public interface ErrorFactory {
     ApplicationError validationFailed(String message);
 
     @ErrorTemplate(
-            code = "taskl.api.error.bad-request",
-            httpStatus = HttpStatus.BAD_REQUEST,
-            description = "Bad request",
-            message = "{{message}}"
-    )
-    ApplicationError badRequest(String message);
-
-    @ErrorTemplate(
             code = "taskl.api.error.authentication.user-exists",
             httpStatus = HttpStatus.CONFLICT,
             description = "User already exists",
