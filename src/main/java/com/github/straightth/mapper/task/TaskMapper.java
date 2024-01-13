@@ -13,8 +13,11 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring", uses = UserMapperEnricher.class)
 public interface TaskMapper {
 
+    @Mapping(target = "id", ignore = true)
     Task createTaskRequestToTask(CreateTaskRequest request);
+
     @Mapping(source = "assigneeUserId", target = "assigneeUser")
     TaskResponse taskToTaskResponse(Task task);
+
     Collection<TaskResponse> tasksToTaskResponses(Collection<Task> tasks);
 }

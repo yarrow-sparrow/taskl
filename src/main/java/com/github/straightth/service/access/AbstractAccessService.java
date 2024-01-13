@@ -10,7 +10,9 @@ public abstract class AbstractAccessService<EntityT, IdT, NotFoundExceptionT ext
         implements AccessService<EntityT, IdT> {
 
     public abstract Function<Collection<IdT>, Collection<EntityT>> defaultAccessFunction();
+
     public abstract Function<Collection<IdT>, Collection<EntityT>> securedAccessFunction();
+
     public abstract Supplier<NotFoundExceptionT> notFoundExceptionSupplier();
 
     private Collection<EntityT> getPresentOrThrowInternal(
@@ -38,18 +40,22 @@ public abstract class AbstractAccessService<EntityT, IdT, NotFoundExceptionT ext
     }
 
 
+    @Override
     public EntityT getPresentOrThrow(IdT id) {
         return getPresentOrThrowInternal(id, defaultAccessFunction());
     }
 
-    public EntityT getPresentOrThrowSecured(IdT id) {
-        return getPresentOrThrowInternal(id, securedAccessFunction());
-    }
-
+    @Override
     public Collection<EntityT> getPresentOrThrow(Collection<IdT> ids) {
         return getPresentOrThrowInternal(ids, defaultAccessFunction());
     }
 
+    @Override
+    public EntityT getPresentOrThrowSecured(IdT id) {
+        return getPresentOrThrowInternal(id, securedAccessFunction());
+    }
+
+    @Override
     public Collection<EntityT> getPresentOrThrowSecured(Collection<IdT> ids) {
         return getPresentOrThrowInternal(ids, securedAccessFunction());
     }

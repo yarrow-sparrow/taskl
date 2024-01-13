@@ -13,7 +13,6 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -22,28 +21,23 @@ public class JwtService {
 
     private final JwtProperties jwtProperties;
 
-    public String extractEmail(String token) {
+    public String extractId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(User user) {
-        return generateToken(new HashMap<>(), user);
-    }
-
     public boolean isTokenValid(String token, User user) {
-        var email = extractEmail(token);
-        return email.equals(user.getEmail()) && !isTokenExpired(token);
+        var extractedId = extractId(token);
+        return extractedId.equals(user.getId()) && !isTokenExpired(token);
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
-        final Claims claims = extractAllClaims(token);
+        Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, User user) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .claims(extraClaims)
-                .subject(user.getEmail())
+                .subject(user.getId())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 48))
                 .signWith(getSigningKey())

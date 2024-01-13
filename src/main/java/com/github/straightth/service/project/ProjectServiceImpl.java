@@ -58,7 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public ProjectResponse updateProjectById(String projectId, UpdateProjectRequest request) {
-        //noinspection DuplicatedCode: similar fields and update approach with task
+        //noinspection DuplicatedCode: similar fields and update approach with Task, but different entities
         var project = projectAccessService.getPresentOrThrowSecured(projectId);
 
         var name = request.getName();

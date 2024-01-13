@@ -15,7 +15,10 @@ import org.springframework.stereotype.Component;
 public interface ProjectMapper {
 
     Collection<ProjectShortResponse> projectsToProjectShortResponses(Collection<Project> projects);
+
     @Mapping(source = "memberUserIds", target = "memberUsers")
     ProjectResponse projectToProjectResponse(Project project);
+
+    @Mapping(target = "id", ignore = true)
     Project createProjectRequestToProject(CreateProjectRequest request);
 }

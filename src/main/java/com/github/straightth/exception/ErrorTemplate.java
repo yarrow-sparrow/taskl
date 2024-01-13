@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 
     HttpStatus httpStatus();
 
-    String description();
+    String summary();
 
     String message();
 

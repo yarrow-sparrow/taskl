@@ -26,6 +26,9 @@ public class UserMapperEnricherImpl implements UserMapperEnricher {
 
     @Override
     public UserShortResponse userToUserShortResponse(String userId) {
+        if (userId == null) {
+            return null;
+        }
         var presentUser = userPresenceService.getPresentOrThrow(userId);
         return userMapper.userToUserShortResponse(presentUser);
     }

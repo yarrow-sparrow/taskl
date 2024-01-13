@@ -3,8 +3,7 @@ package com.github.straightth.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Error factory for reducing boilerplate of error handling code,
- *  make it declarative and support templating
+ * Error factory for reducing boilerplate of error handling code, make it declarative and support templating
  */
 public interface ErrorFactory {
 
@@ -13,9 +12,17 @@ public interface ErrorFactory {
     }
 
     @ErrorTemplate(
+            code = "taskl.api.error.bad-request",
+            httpStatus = HttpStatus.BAD_REQUEST,
+            summary = "Bad request",
+            message = "Bad request"
+    )
+    ApplicationError badRequest();
+
+    @ErrorTemplate(
             code = "taskl.api.error.validation-failed",
             httpStatus = HttpStatus.BAD_REQUEST,
-            description = "Validation failed",
+            summary = "Validation failed",
             message = "{{message}}"
     )
     ApplicationError validationFailed(String message);
@@ -23,7 +30,7 @@ public interface ErrorFactory {
     @ErrorTemplate(
             code = "taskl.api.error.authentication.user-exists",
             httpStatus = HttpStatus.CONFLICT,
-            description = "User already exists",
+            summary = "User already exists",
             message = "User already exists"
     )
     ApplicationError userAlreadyExists();
@@ -31,7 +38,7 @@ public interface ErrorFactory {
     @ErrorTemplate(
             code = "taskl.api.error.authentication.no-user-with-such-email",
             httpStatus = HttpStatus.BAD_REQUEST,
-            description = "No user with such email",
+            summary = "No user with such email",
             message = "No user with such email"
     )
     ApplicationError noUserWithSuchEmail();
@@ -39,7 +46,7 @@ public interface ErrorFactory {
     @ErrorTemplate(
             code = "taskl.api.error.authentication.incorrect-password",
             httpStatus = HttpStatus.BAD_REQUEST,
-            description = "Incorrect password",
+            summary = "Incorrect password",
             message = "Incorrect password"
     )
     ApplicationError incorrectPassword();
@@ -47,7 +54,7 @@ public interface ErrorFactory {
     @ErrorTemplate(
             code = "taskl.api.error.user.not-found",
             httpStatus = HttpStatus.NOT_FOUND,
-            description = "User not found",
+            summary = "User not found",
             message = "User not found"
     )
     ApplicationError userNotFound();
@@ -55,7 +62,7 @@ public interface ErrorFactory {
     @ErrorTemplate(
             code = "taskl.api.error.project.not-found",
             httpStatus = HttpStatus.NOT_FOUND,
-            description = "Project not found",
+            summary = "Project not found",
             message = "Project not found"
     )
     ApplicationError projectNotFound();
@@ -63,15 +70,23 @@ public interface ErrorFactory {
     @ErrorTemplate(
             code = "taskl.api.error.task.not-found",
             httpStatus = HttpStatus.NOT_FOUND,
-            description = "Task not found",
+            summary = "Task not found",
             message = "Task not found"
     )
     ApplicationError taskNotFound();
 
     @ErrorTemplate(
+            code = "taskl.api.error.task.invalid-assignee-nullify",
+            httpStatus = HttpStatus.BAD_REQUEST,
+            summary = "Bad request",
+            message = "Assignee id must be not present or null if nullifyAssigneeId is true"
+    )
+    ApplicationError assigneeIdIsNotBlankOnNullify();
+
+    @ErrorTemplate(
             code = "taskl.api.error.unknown",
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
-            description = "Unknown error",
+            summary = "Unknown error",
             message = "Unknown error"
     )
     ApplicationError internalServerError();

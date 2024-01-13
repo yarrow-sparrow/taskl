@@ -1,7 +1,6 @@
 package com.github.straightth.controller;
 
 import com.github.straightth.dto.request.UpdateUserHimselfRequest;
-import com.github.straightth.dto.response.UserHimselfResponse;
 import com.github.straightth.dto.response.UserResponse;
 import com.github.straightth.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +25,12 @@ public class UserController {
     }
 
     @GetMapping("/self")
-    public UserHimselfResponse getUserHimself() {
+    public UserResponse getUserHimself() {
         return userService.getUserHimself();
     }
 
     @PutMapping("/self")
-    public UserHimselfResponse updateUser(@RequestBody UpdateUserHimselfRequest request) {
+    public UserResponse updateUserHimself(@RequestBody UpdateUserHimselfRequest request) {
         return userService.updateUserHimself(request);
     }
 }

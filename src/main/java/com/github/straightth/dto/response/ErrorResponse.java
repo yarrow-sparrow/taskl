@@ -11,6 +11,6 @@ public class ErrorResponse {
 
     String code;
     int httpStatus;
-    String description;
+    String summary;
     String message;
 }

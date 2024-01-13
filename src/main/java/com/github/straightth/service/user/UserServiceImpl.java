@@ -1,7 +1,6 @@
 package com.github.straightth.service.user;
 
 import com.github.straightth.dto.request.UpdateUserHimselfRequest;
-import com.github.straightth.dto.response.UserHimselfResponse;
 import com.github.straightth.dto.response.UserResponse;
 import com.github.straightth.mapper.user.UserMapper;
 import com.github.straightth.repository.UserRepository;
@@ -26,14 +25,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserHimselfResponse getUserHimself() {
+    public UserResponse getUserHimself() {
         var userId = SecurityUtil.getCurrentUserId();
         var user = userPresenceService.getPresentOrThrow(userId);
-        return userMapper.userToUserHimselfResponse(user);
+        return userMapper.userToUserResponse(user);
     }
 
     @Override
-    public UserHimselfResponse updateUserHimself(UpdateUserHimselfRequest request) {
+    public UserResponse updateUserHimself(UpdateUserHimselfRequest request) {
         var userId = SecurityUtil.getCurrentUserId();
         var user = userPresenceService.getPresentOrThrow(userId);
 
@@ -41,20 +40,12 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotBlank(username)) {
             user.setUsername(username);
         }
-        var telegram = request.getTelegram();
-        if (StringUtils.isNotBlank(telegram)) {
-            user.setTelegram(telegram);
-        }
-        var role = request.getRole();
-        if (StringUtils.isNotBlank(role)) {
-            user.setRole(role);
-        }
         var phoneNumber = request.getPhoneNumber();
         if (StringUtils.isNotBlank(phoneNumber)) {
             user.setPhoneNumber(phoneNumber);
         }
 
         user = userRepository.save(user);
-        return userMapper.userToUserHimselfResponse(user);
+        return userMapper.userToUserResponse(user);
     }
 }

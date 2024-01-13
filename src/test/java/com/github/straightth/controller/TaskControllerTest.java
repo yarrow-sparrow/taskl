@@ -8,15 +8,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.github.straightth.MockMvcAbstractTest;
 import com.github.straightth.authentication.WithUserMock;
-import com.github.straightth.domain.Project;
 import com.github.straightth.domain.Task;
 import com.github.straightth.domain.TaskStatus;
-import com.github.straightth.domain.User;
 import com.github.straightth.dto.request.CreateTaskRequest;
 import com.github.straightth.dto.request.UpdateTaskRequest;
 import com.github.straightth.repository.ProjectRepository;
 import com.github.straightth.repository.TaskRepository;
 import com.github.straightth.repository.UserRepository;
+import com.github.straightth.util.TestEntityFactory;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -328,6 +327,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                                     .value("Task name must be between 1 and 30 characters"));
                 }
 
+                //TODO: think about it
                 @Test
                 @WithUserMock
                 public void nullInNameLeadsTo400() throws Exception {
@@ -535,7 +535,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
 
         @Test
         @WithUserMock
-        public void tasksIsReturned() throws Exception {
+        public void taskListIsReturned() throws Exception {
             //Arrange
             var projectId = createProject();
 
@@ -863,6 +863,78 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .andExpect(jsonPath("$.message").value("User not found"));
         }
 
+        @Test
+        @WithUserMock
+        public void taskAssigneeIsNullified() throws Exception {
+            //Arrange
+            var projectId = createProject();
+            var mockedUserId = getMockedUserId();
+
+            var taskId = createTask(t -> {
+                t.setProjectId(projectId);
+                t.setName("Task name");
+                t.setDescription("Task description");
+                t.setAssigneeUserId(mockedUserId);
+                t.setStatus(TaskStatus.REVIEW);
+                t.setStoryPoints(2.7d);
+            });
+
+            var request = UpdateTaskRequest.builder()
+                    .nullifyAssigneeUserId(true)
+                    .build();
+
+            var expectedTask = Task.builder()
+                    .id(taskId)
+                    .projectId(projectId)
+                    .name("Task name")
+                    .description("Task description")
+                    .assigneeUserId(null)
+                    .status(TaskStatus.REVIEW)
+                    .storyPoints(2.7d)
+                    .build();
+
+            //Act
+            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            );
+
+            //Assert
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.assigneeUser.id").doesNotExist());
+
+            var actualTask = taskRepository.findAll().getFirst();
+            Assertions.assertThat(actualTask)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expectedTask);
+        }
+
+        @Test
+        @WithUserMock
+        public void assigneeIdWithNullifyFlagLeadsTo400() throws Exception {
+            //Arrange
+            var projectId = createProject();
+            var mockedUserId = getMockedUserId();
+
+            var taskId = createTask(t -> t.setProjectId(projectId));
+
+            var request = UpdateTaskRequest.builder()
+                    .assigneeUserId(mockedUserId)
+                    .nullifyAssigneeUserId(true)
+                    .build();
+
+            //Act
+            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            );
+
+            //Assert
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value("Assignee id must be not present or null if nullifyAssigneeId is true"));
+        }
+
         @Nested
         class Validation {
 
@@ -1121,43 +1193,25 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         }
     }
 
-    private String createTask(Consumer<Task> preconfigure) {
-        var task = Task.builder()
-                .projectId(null)
-                .name("Test name")
-                .description("Test description")
-                .assigneeUserId(getMockedUserId())
-                .status(TaskStatus.BACKLOG)
-                .storyPoints(1d)
-                .build();
-        preconfigure.accept(task);
-        return taskRepository.save(task).getId();
+    private String createOtherUser() {
+        var anotherUser = TestEntityFactory.createUser();
+        return userRepository.save(anotherUser).getId();
     }
 
     private String createProject() {
-        var project = Project.builder()
-                .name("Test name")
-                .description("Test description")
-                .memberUserIds(List.of(getMockedUserId()))
-                .build();
+        var project = TestEntityFactory.createProject();
         return projectRepository.save(project).getId();
     }
 
     private String createInaccessibleProject() {
-        var project = Project.builder()
-                .name("Test name")
-                .description("Test description")
-                .memberUserIds(List.of(RANDOM_UUID))
-                .build();
+        var project = TestEntityFactory.createProject();
+        project.setMemberUserIds(List.of(RANDOM_UUID));
         return projectRepository.save(project).getId();
     }
 
-    private String createOtherUser() {
-        var anotherUser = User.builder()
-                .username("user")
-                .email("user@email.com")
-                .password("password")
-                .build();
-        return userRepository.save(anotherUser).getId();
+    private String createTask(Consumer<Task> preconfigure) {
+        var task = TestEntityFactory.createTask();
+        preconfigure.accept(task);
+        return taskRepository.save(task).getId();
     }
 }

@@ -1,8 +1,8 @@
 package com.github.straightth.controller;
 
 import com.github.straightth.dto.response.ErrorResponse;
-import com.github.straightth.exception.ErrorFactory;
 import com.github.straightth.exception.ApplicationError;
+import com.github.straightth.exception.ErrorFactory;
 import com.google.common.base.Throwables;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +28,18 @@ public class ExceptionHandlingAdvice {
         return ResponseEntity.status(e.getHttpStatus().value()).body(e.toResponse());
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorResponse missingServletRequestParameterExceptionHandler() {
+        return ErrorFactory.get().badRequest().toResponse();
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorResponse httpMessageNotReadableException() {
+        return ErrorFactory.get().badRequest().toResponse();
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorResponse methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
@@ -43,23 +55,11 @@ public class ExceptionHandlingAdvice {
         return ErrorFactory.get().validationFailed(message).toResponse();
     }
 
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorResponse missingServletRequestParameterExceptionHandler() {
-        return ErrorFactory.get().validationFailed("Bad request").toResponse();
-    }
-
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorResponse constraintViolationExceptionHandler(ConstraintViolationException e) {
         var message = e.getConstraintViolations().iterator().next().getMessage();
         return ErrorFactory.get().validationFailed(message).toResponse();
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorResponse httpMessageNotReadableException() {
-        return ErrorFactory.get().validationFailed("Bad request").toResponse();
     }
 
     @ExceptionHandler(Exception.class)

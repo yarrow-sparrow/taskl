@@ -31,8 +31,8 @@ public class ErrorFactoryInitializer {
             //Validating annotation presence
             var annotation = method.getAnnotation(ErrorTemplate.class);
             if (annotation == null) {
-                var message = "Method " + method.getName() + " doesn't annotated with @ErrorTemplate. " +
-                        "Every method must be annotated with @ErrorTemplate annotation to implement Error API.";
+                var message = "Method " + method.getName() + " doesn't annotated with @ErrorTemplate. "
+                        + "Every method must be annotated with @ErrorTemplate annotation to implement Error API.";
                 throw new IllegalStateException(message);
             }
 
@@ -40,8 +40,8 @@ public class ErrorFactoryInitializer {
             var parameterNames = Stream.of(method.getParameters())
                     .map(p -> {
                         if (!p.isNamePresent()) {
-                            var message = "No parameter name is present. " +
-                                    "Program must be compiled with -parameters option.";
+                            var message = "No parameter name is present. "
+                                    + "Program must be compiled with -parameters option.";
                             throw new IllegalStateException(message);
                         }
                         return p.getName();
@@ -65,8 +65,8 @@ public class ErrorFactoryInitializer {
         while (matcher.find()) {
             var parameterName = matcher.group(1);
             if (!parameterNames.contains(parameterName)) {
-                var message = "Method " + methodName + " has no parameter with name " + parameterName +
-                        " in method signature while having it in template.";
+                var message = "Method " + methodName + " has no parameter with name " + parameterName
+                        + " in method signature while having it in template.";
                 throw new IllegalStateException(message);
             }
         }
@@ -95,7 +95,7 @@ public class ErrorFactoryInitializer {
         return new ApplicationError(
                 annotation.code(),
                 annotation.httpStatus(),
-                annotation.description(),
+                annotation.summary(),
                 annotation.level(),
                 annotation.message(),
                 parameters

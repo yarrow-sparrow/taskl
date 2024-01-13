@@ -37,7 +37,12 @@ public class SecurityConfiguration {
     ) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/v1/auth/**", "/ping").permitAll()
+                        .requestMatchers(
+                                //Auth
+                                "/v1/auth/**", "/ping",
+                                //OpenAPI UI
+                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
