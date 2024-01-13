@@ -9,7 +9,10 @@ import java.util.Collection;
 public interface ProjectService {
 
     ProjectResponse createProject(CreateProjectRequest request);
+
     Collection<ProjectShortResponse> getUserProjects();
+
     ProjectResponse getProjectById(String projectId);
+
     ProjectResponse updateProjectById(String projectId, UpdateProjectRequest request);
 }

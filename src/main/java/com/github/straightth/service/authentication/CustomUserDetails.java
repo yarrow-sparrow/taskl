@@ -14,9 +14,13 @@ public class CustomUserDetails implements UserDetails {
     String email;
     String password;
 
+    public static CustomUserDetails of(User user) {
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword());
+    }
+
     @Override
     public String getUsername() {
-        return email;
+        return id;
     }
 
     @Override
@@ -42,9 +46,5 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public static CustomUserDetails of(User user) {
-        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword());
     }
 }

@@ -51,7 +51,6 @@ public class AuthenticationService {
 
         return AuthenticationResponse.builder()
                 .token(jwt)
-                .userId(user.getId())
                 .build();
     }
 

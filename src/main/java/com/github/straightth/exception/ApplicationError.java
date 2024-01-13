@@ -6,23 +6,20 @@ import com.github.straightth.dto.response.ErrorResponse;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@EqualsAndHashCode(callSuper = false)
 public class ApplicationError extends RuntimeException {
 
     private static final MustacheFactory MUSTACHE_FACTORY = new DefaultMustacheFactory();
-
-    public enum Level {
-        INFO, WARNING, ERROR
-    }
-
     @Getter
     private final String code;
     @Getter
     private final HttpStatus httpStatus;
     @Getter
-    private final String description;
+    private final String summary;
     @Getter
     private final Level level;
     private final String messageTemplate;
@@ -31,14 +28,14 @@ public class ApplicationError extends RuntimeException {
     public ApplicationError(
             String code,
             HttpStatus httpStatus,
-            String description,
+            String summary,
             Level level,
             String messageTemplate,
             Map<String, Object> parameters
     ) {
         this.code = code;
         this.httpStatus = httpStatus;
-        this.description = description;
+        this.summary = summary;
         this.level = level;
         this.messageTemplate = messageTemplate;
         this.parameters = parameters;
@@ -55,8 +52,12 @@ public class ApplicationError extends RuntimeException {
         return ErrorResponse.builder()
                 .code(code)
                 .httpStatus(httpStatus.value())
-                .description(description)
+                .summary(summary)
                 .message(getMessage())
                 .build();
+    }
+
+    public enum Level {
+        INFO, WARNING, ERROR
     }
 }

@@ -1,9 +1,10 @@
 package com.github.straightth.service.task;
 
-import com.github.straightth.mapper.task.TaskMapper;
 import com.github.straightth.dto.request.CreateTaskRequest;
 import com.github.straightth.dto.request.UpdateTaskRequest;
 import com.github.straightth.dto.response.TaskResponse;
+import com.github.straightth.exception.ErrorFactory;
+import com.github.straightth.mapper.task.TaskMapper;
 import com.github.straightth.repository.TaskRepository;
 import com.github.straightth.service.project.ProjectAccessService;
 import com.github.straightth.service.user.UserAccessService;
@@ -59,7 +60,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     @Override
     public TaskResponse updateTaskById(String taskId, UpdateTaskRequest request) {
-        //noinspection DuplicatedCode: similar fields and update approach with project
+        //noinspection DuplicatedCode: similar fields and update approach with Project, but different entities
         var task = taskAccessService.getPresentOrThrowSecured(taskId);
 
         var name = request.getName();
@@ -86,6 +87,16 @@ public class TaskServiceImpl implements TaskService {
         var storyPoints = request.getStoryPoints();
         if (storyPoints != null) {
             task.setStoryPoints(storyPoints);
+        }
+
+        var nullifyAssignee = request.getNullifyAssigneeUserId();
+        if (nullifyAssignee != null) {
+            if (StringUtils.isNotBlank(assigneeUserId)) {
+                throw ErrorFactory.get().assigneeIdIsNotBlankOnNullify();
+            }
+            if (nullifyAssignee) {
+                task.setAssigneeUserId(null);
+            }
         }
 
         task = taskRepository.save(task);

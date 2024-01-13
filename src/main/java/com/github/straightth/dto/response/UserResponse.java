@@ -14,9 +14,5 @@ public class UserResponse {
     String username;
     String initials;
     String email;
-    String telegram;
-    String role;
     String phoneNumber;
-    //TODO: get rid of it
-    Collection<ProjectShortResponse> mutualProjects;
 }

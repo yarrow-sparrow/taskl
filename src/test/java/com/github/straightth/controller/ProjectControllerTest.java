@@ -10,11 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.github.straightth.MockMvcAbstractTest;
 import com.github.straightth.authentication.WithUserMock;
 import com.github.straightth.domain.Project;
-import com.github.straightth.domain.User;
 import com.github.straightth.dto.request.CreateProjectRequest;
 import com.github.straightth.dto.request.UpdateProjectRequest;
 import com.github.straightth.repository.ProjectRepository;
 import com.github.straightth.repository.UserRepository;
+import com.github.straightth.util.TestEntityFactory;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -213,7 +213,6 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nullInNameLeadsTo400() throws Exception {
                     //Arrange
-                    @SuppressWarnings("DataFlowIssue")
                     var request = CreateProjectRequest.builder()
                             .name(null)
                             .build();
@@ -249,7 +248,8 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
                     //Assert
                     result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message").value("Project description must be between 1 and 300 characters"));
+                            .andExpect(jsonPath("$.message")
+                                    .value("Project description must be between 1 and 300 characters"));
                 }
 
                 @Test
@@ -313,7 +313,6 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
             @WithUserMock
             public void nullInDescriptionLeadsTo400() throws Exception {
                 //Arrange
-                @SuppressWarnings("DataFlowIssue")
                 var request = CreateProjectRequest.builder()
                         .description(null)
                         .build();
@@ -744,21 +743,13 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
     }
 
     private String createProject(Consumer<Project> preconfigure) {
-        var project = Project.builder()
-                .name("Test name")
-                .description("Test description")
-                .memberUserIds(List.of(getMockedUserId()))
-                .build();
+        var project = TestEntityFactory.createProject();
         preconfigure.accept(project);
         return projectRepository.save(project).getId();
     }
 
     private String createOtherUser() {
-        var anotherUser = User.builder()
-                .username("user")
-                .email("user@email.com")
-                .password("password")
-                .build();
+        var anotherUser = TestEntityFactory.createUser();
         return userRepository.save(anotherUser).getId();
     }
 }

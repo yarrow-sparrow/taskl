@@ -1,9 +1,9 @@
-package com.github.straightth.tool;
+package com.github.straightth.local;
 
-import com.github.straightth.service.authentication.AuthenticationService;
 import com.github.straightth.dto.request.SignInRequest;
 import com.github.straightth.dto.request.SignUpRequest;
 import com.github.straightth.repository.UserRepository;
+import com.github.straightth.service.authentication.AuthenticationService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,9 +1,9 @@
 package com.github.straightth.controller;
 
-import com.github.straightth.service.authentication.AuthenticationService;
 import com.github.straightth.dto.request.SignInRequest;
 import com.github.straightth.dto.request.SignUpRequest;
 import com.github.straightth.dto.response.AuthenticationResponse;
+import com.github.straightth.service.authentication.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

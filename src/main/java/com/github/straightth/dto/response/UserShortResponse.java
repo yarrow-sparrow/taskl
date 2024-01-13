@@ -12,5 +12,4 @@ public class UserShortResponse {
     String id;
     String username;
     String initials;
-    String role;
 }

@@ -10,7 +10,7 @@ import com.github.straightth.authentication.WithUserMock;
 import com.github.straightth.domain.User;
 import com.github.straightth.dto.request.UpdateUserHimselfRequest;
 import com.github.straightth.repository.UserRepository;
-import java.util.UUID;
+import com.github.straightth.util.TestEntityFactory;
 import java.util.function.Consumer;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class UserControllerTest extends MockMvcAbstractTest {
-
-    private static final String RANDOM_UUID = UUID.randomUUID().toString();
 
     @Autowired
     private UserRepository userRepository;
@@ -89,8 +87,6 @@ public class UserControllerTest extends MockMvcAbstractTest {
             //Arrange
             var request = UpdateUserHimselfRequest.builder()
                     .username("newUsername")
-                    .telegram("newTelegram")
-                    .role("newRole")
                     .phoneNumber("+1")
                     .build();
 
@@ -100,8 +96,6 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     .email("explicit@email.com")
                     .username("newUsername")
                     .password("explicitPassword")
-                    .telegram("newTelegram")
-                    .role("newRole")
                     .phoneNumber("+1")
                     .build();
 
@@ -113,8 +107,6 @@ public class UserControllerTest extends MockMvcAbstractTest {
             //Assert
             result.andExpect(status().isOk())
                     .andExpect(jsonPath("$.username").value("newUsername"))
-                    .andExpect(jsonPath("$.telegram").value("newTelegram"))
-                    .andExpect(jsonPath("$.role").value("newRole"))
                     .andExpect(jsonPath("$.phoneNumber").value("+1"));
 
             var user = userRepository.findByEmail("explicit@email.com").orElseThrow();
@@ -135,8 +127,6 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     .email("explicit@email.com")
                     .username("explicitUsername")
                     .password("explicitPassword")
-                    .telegram(null)
-                    .role(null)
                     .phoneNumber(null)
                     .build();
 
@@ -148,8 +138,6 @@ public class UserControllerTest extends MockMvcAbstractTest {
             //Assert
             result.andExpect(status().isOk())
                     .andExpect(jsonPath("$.username").value("explicitUsername"))
-                    .andExpect(jsonPath("$.telegram").isEmpty())
-                    .andExpect(jsonPath("$.role").isEmpty())
                     .andExpect(jsonPath("$.phoneNumber").isEmpty());
 
             var user = userRepository.findByEmail("explicit@email.com").orElseThrow();
@@ -160,10 +148,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
     }
 
     private String createUser(Consumer<User> preconfigure) {
-        var user = User.builder()
-                .username("Test username")
-                .email("test@email.com")
-                .build();
+        var user = TestEntityFactory.createUser();
         preconfigure.accept(user);
         return userRepository.save(user).getId();
     }

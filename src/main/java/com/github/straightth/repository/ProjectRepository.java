@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ProjectRepository extends MongoRepository<Project, String> {
 
-    //TODO: inspect security
     Collection<Project> findProjectsByMemberUserIdsContains(String userId);
 
     Optional<Project> findProjectByIdAndMemberUserIdsContains(String projectId, String userId);

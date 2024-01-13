@@ -1,8 +1,8 @@
 package com.github.straightth.config;
 
+import com.github.straightth.repository.UserRepository;
 import com.github.straightth.service.authentication.CustomUserDetails;
 import com.github.straightth.service.authentication.JwtService;
-import com.github.straightth.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,11 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         var jwt = authHeader.substring(7);
 
-        var email = jwtService.extractEmail(jwt);
-        var user = userRepository.findByEmail(email).orElseThrow();
+        var userId = jwtService.extractId(jwt);
+        var user = userRepository.findById(userId).orElseThrow();
 
         if (SecurityContextHolder.getContext().getAuthentication() == null
-                && StringUtils.isNotEmpty(email)
+                && StringUtils.isNotEmpty(userId)
                 && jwtService.isTokenValid(jwt, user)
         ) {
             var token = new UsernamePasswordAuthenticationToken(

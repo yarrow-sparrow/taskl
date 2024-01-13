@@ -1,10 +1,10 @@
 package com.github.straightth.service.project;
 
 import com.github.straightth.domain.Project;
-import com.github.straightth.repository.ProjectRepository;
-import com.github.straightth.service.access.AbstractAccessService;
 import com.github.straightth.exception.ApplicationError;
 import com.github.straightth.exception.ErrorFactory;
+import com.github.straightth.repository.ProjectRepository;
+import com.github.straightth.service.access.AbstractAccessService;
 import com.github.straightth.util.SecurityUtil;
 import java.util.Collection;
 import java.util.function.Function;

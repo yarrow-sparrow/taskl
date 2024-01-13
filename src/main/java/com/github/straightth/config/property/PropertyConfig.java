@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties({
         JwtProperties.class,
-        MongoApplicationProperties.class,
 })
 public class PropertyConfig {
+
 }
