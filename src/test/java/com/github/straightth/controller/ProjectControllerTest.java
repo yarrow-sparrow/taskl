@@ -15,7 +15,6 @@ import com.github.straightth.dto.request.CreateProjectRequest;
 import com.github.straightth.dto.request.UpdateProjectRequest;
 import com.github.straightth.repository.ProjectRepository;
 import com.github.straightth.repository.UserRepository;
-import com.github.straightth.util.SecurityUtil;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -26,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+//TODO: test cases
 public class ProjectControllerTest extends MockMvcAbstractTest {
 
     private static final String RANDOM_UUID = UUID.randomUUID().toString();
@@ -42,18 +42,18 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void createProject() throws Exception {
             //Arrange
-            var mockedUserId = SecurityUtil.getCurrentUserId();
+            var mockedUserId = getMockedUserId();
             var otherUserId = createOtherUser();
 
             var request = CreateProjectRequest.builder()
-                    .name("New name")
-                    .description("New description")
+                    .name("Created project name")
+                    .description("Created project description")
                     .memberUserIds(List.of(otherUserId))
                     .build();
 
             var expectedProject = Project.builder()
-                    .name("New name")
-                    .description("New description")
+                    .name("Created project name")
+                    .description("Created project description")
                     .memberUserIds(List.of(mockedUserId, otherUserId))
                     .build();
 
@@ -65,8 +65,8 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
             //Assert
             result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name").value("New name"))
-                    .andExpect(jsonPath("$.description").value("New description"))
+                    .andExpect(jsonPath("$.name").value("Created project name"))
+                    .andExpect(jsonPath("$.description").value("Created project description"))
                     // Mocked user is added to the project as a first member
                     .andExpect(jsonPath("$.memberUsers", hasSize(2)));
 
@@ -83,7 +83,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void defaultParametersAreApplied() throws Exception {
             //Arrange
-            var mockedUserId = SecurityUtil.getCurrentUserId();
+            var mockedUserId = getMockedUserId();
 
             var expectedProject = Project.builder()
                     .name("New project")
@@ -427,9 +427,9 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
         @Test
         @WithUserMock
-        public void updatedEntityIsBeingReturned() throws Exception {
+        public void projectIsUpdated() throws Exception {
             //Arrange
-            var mockedUserId = SecurityUtil.getCurrentUserId();
+            var mockedUserId = getMockedUserId();
             var projectId = createProject(p -> {
                 p.setName("Initial name");
                 p.setDescription("Initial description");
@@ -474,9 +474,9 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
         @Test
         @WithUserMock
-        public void emptyUpdateIsNotApplied() throws Exception {
+        public void emptyUpdateMakeNoChanges() throws Exception {
             //Arrange
-            var mockedUserId = SecurityUtil.getCurrentUserId();
+            var mockedUserId = getMockedUserId();
             var projectId = createProject(p -> {
                 p.setName("Initial name");
                 p.setDescription("Initial description");
@@ -500,86 +500,6 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
             var actualProject = projectRepository.findAll().getFirst();
             Assertions.assertThat(actualProject)
                     .isEqualTo(expectedProject);
-        }
-
-        @Test
-        @WithUserMock
-        public void alterProjectName() throws Exception {
-            //Arrange
-            var projectId = createProject(p -> {
-                p.setName("Initial name");
-                p.setDescription("Initial description");
-            });
-
-            var request = UpdateProjectRequest.builder().name("New name").build();
-
-            //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
-            );
-
-            //Assert
-            result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name").value("New name"));
-
-            var actualProject = projectRepository.findAll().getFirst();
-            Assertions.assertThat(actualProject.getName()).isEqualTo("New name");
-        }
-
-        @Test
-        @WithUserMock
-        public void alterProjectDescription() throws Exception {
-            //Arrange
-            var projectId = createProject(p -> {
-                p.setName("Initial name");
-                p.setDescription("Initial description");
-            });
-
-            var request = UpdateProjectRequest.builder().description("New description").build();
-
-            //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
-            );
-
-            //Assert
-            result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.description").value("New description"));
-
-            var actualProject = projectRepository.findAll().getFirst();
-            Assertions.assertThat(actualProject.getDescription()).isEqualTo("New description");
-        }
-
-        @Test
-        @WithUserMock
-        public void alterProjectMembers() throws Exception {
-            //Arrange
-            var mockedUserId = getCurrentUserId();
-            var projectId = createProject(p -> {
-                p.setName("Initial name");
-                p.setDescription("Initial description");
-            });
-
-            var otherUserId = createOtherUser();
-
-            var request = UpdateProjectRequest.builder()
-                    .memberUserIds(List.of(mockedUserId, otherUserId))
-                    .build();
-
-            //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
-            );
-
-            //Assert
-            result.andExpect(status().isOk());
-
-            var actualProject = projectRepository.findAll().getFirst();
-            Assertions.assertThat(actualProject.getMemberUserIds())
-                    .containsExactlyInAnyOrder(mockedUserId, otherUserId);
         }
 
         @Test
@@ -828,7 +748,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         var project = Project.builder()
                 .name("Test name")
                 .description("Test description")
-                .memberUserIds(List.of(getCurrentUserId()))
+                .memberUserIds(List.of(getMockedUserId()))
                 .build();
         preconfigure.accept(project);
         return projectRepository.save(project).getId();

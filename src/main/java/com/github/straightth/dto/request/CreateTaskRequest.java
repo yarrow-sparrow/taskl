@@ -1,7 +1,6 @@
 package com.github.straightth.dto.request;
 
 import com.github.straightth.domain.TaskStatus;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -34,7 +33,7 @@ public class CreateTaskRequest {
     @Builder.Default
     String assigneeUserId = null;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "{taskl.validation.task.story-points.positive-or-zero}")
     @Builder.Default
     Double storyPoints = 0d;
 }

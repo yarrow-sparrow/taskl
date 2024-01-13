@@ -5,6 +5,7 @@ import com.github.straightth.dto.request.UpdateTaskRequest;
 import com.github.straightth.dto.response.TaskResponse;
 import com.github.straightth.service.task.TaskService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public Collection<TaskResponse> getTasks(@RequestParam String projectId) {
+    public Collection<TaskResponse> getTasksByProjectId(@RequestParam @Valid @NotNull String projectId) {
         return taskService.getTasksByProjectId(projectId);
     }
 

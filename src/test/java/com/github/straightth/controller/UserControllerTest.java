@@ -67,7 +67,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
         @WithUserMock(username = "Expected username", email = "expected@email.com")
         public void getUserHimself() throws Exception {
             //Arrange
-            var expectedUserId = getCurrentUserId();
+            var expectedUserId = getMockedUserId();
 
             //Act
             var result = mockMvc.perform(get("/v1/user/self"));
@@ -85,7 +85,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
 
         @Test
         @WithUserMock(email = "explicit@email.com", encodedPassword = "explicitPassword")
-        public void updateUserHimself() throws Exception {
+        public void userIsUpdated() throws Exception {
             //Arrange
             var request = UpdateUserHimselfRequest.builder()
                     .username("newUsername")
@@ -94,7 +94,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     .phoneNumber("+1")
                     .build();
 
-            var expectedUserId = getCurrentUserId();
+            var expectedUserId = getMockedUserId();
             var expectedUser = User.builder()
                     .id(expectedUserId)
                     .email("explicit@email.com")
@@ -129,7 +129,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
             //Arrange
             var request = UpdateUserHimselfRequest.builder().build();
 
-            var expectedUserId = getCurrentUserId();
+            var expectedUserId = getMockedUserId();
             var expectedUser = User.builder()
                     .id(expectedUserId)
                     .email("explicit@email.com")

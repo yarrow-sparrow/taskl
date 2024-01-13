@@ -27,7 +27,7 @@ public class UpdateTaskRequest {
     @Nullable
     String assigneeUserId;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "{taskl.validation.task.story-points.positive-or-zero}")
     @Nullable
     Double storyPoints;
 }
