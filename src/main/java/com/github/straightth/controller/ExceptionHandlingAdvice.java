@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -41,11 +43,23 @@ public class ExceptionHandlingAdvice {
         return ErrorFactory.get().validationFailed(message).toResponse();
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorResponse missingServletRequestParameterExceptionHandler() {
+        return ErrorFactory.get().validationFailed("Bad request").toResponse();
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorResponse constraintViolationExceptionHandler(ConstraintViolationException e) {
         var message = e.getConstraintViolations().iterator().next().getMessage();
         return ErrorFactory.get().validationFailed(message).toResponse();
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorResponse httpMessageNotReadableException() {
+        return ErrorFactory.get().validationFailed("Bad request").toResponse();
     }
 
     @ExceptionHandler(Exception.class)

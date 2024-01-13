@@ -18,7 +18,7 @@ public abstract class MockMvcAbstractTest {
     @Autowired
     protected MockMvc mockMvc;
 
-    protected String getCurrentUserId() {
+    protected String getMockedUserId() {
         return SecurityUtil.getCurrentUserId();
     }
 }
