@@ -3,6 +3,7 @@ package com.github.straightth.controller;
 import com.github.straightth.dto.request.UpdateUserHimselfRequest;
 import com.github.straightth.dto.response.UserResponse;
 import com.github.straightth.service.user.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class UserController {
     }
 
     @PutMapping("/self")
-    public UserResponse updateUserHimself(@RequestBody UpdateUserHimselfRequest request) {
+    public UserResponse updateUserHimself(@RequestBody @Valid UpdateUserHimselfRequest request) {
         return userService.updateUserHimself(request);
     }
 }

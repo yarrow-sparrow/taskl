@@ -3,7 +3,7 @@ package com.github.straightth.service.authentication;
 import com.github.straightth.domain.User;
 import com.github.straightth.dto.request.SignInRequest;
 import com.github.straightth.dto.request.SignUpRequest;
-import com.github.straightth.dto.response.AuthenticationResponse;
+import com.github.straightth.dto.response.SignInResponse;
 import com.github.straightth.exception.ErrorFactory;
 import com.github.straightth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class AuthenticationService {
 
     public void signUp(SignUpRequest request) {
         if (userRepository.existsUserByEmail(request.getEmail())) {
-            throw ErrorFactory.get().userAlreadyExists();
+            throw ErrorFactory.get().emailAlreadyInUse();
         }
 
         var user = User.builder()
@@ -38,7 +38,7 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
-    public AuthenticationResponse signIn(SignInRequest request) {
+    public SignInResponse signIn(SignInRequest request) {
         var email = request.getEmail();
         var password = request.getPassword();
 
@@ -49,7 +49,7 @@ public class AuthenticationService {
         authenticationManager.authenticate(authenticationToken(email, password));
         var jwt = jwtService.generateToken(user);
 
-        return AuthenticationResponse.builder()
+        return SignInResponse.builder()
                 .token(jwt)
                 .build();
     }

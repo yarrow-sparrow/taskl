@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class AuthenticationResponse {
+public class SignInResponse {
 
     String token;
 }

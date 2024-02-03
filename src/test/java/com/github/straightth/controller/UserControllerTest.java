@@ -12,6 +12,7 @@ import com.github.straightth.dto.request.UpdateUserHimselfRequest;
 import com.github.straightth.repository.UserRepository;
 import com.github.straightth.util.TestEntityFactory;
 import java.util.function.Consumer;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -144,6 +145,90 @@ public class UserControllerTest extends MockMvcAbstractTest {
             Assertions.assertThat(user)
                     .usingRecursiveComparison()
                     .isEqualTo(expectedUser);
+        }
+
+        @Nested
+        class Validation {
+
+            @Nested
+            class Username {
+
+                @Test
+                @WithUserMock
+                public void emptyUsernameLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = UpdateUserHimselfRequest.builder()
+                            .username("")
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(put("/v1/user/self")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Username must be between 1 and 30 characters"));
+                }
+
+                @Test
+                @WithUserMock
+                public void singleCharacterNameLeadsTo200() throws Exception {
+                    //Arrange
+                    var request = UpdateUserHimselfRequest.builder()
+                            .username("*")
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(put("/v1/user/self")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isOk());
+                }
+
+                @Test
+                @WithUserMock
+                public void usernameEqualToLimitLeadsTo200() throws Exception {
+                    //Arrange
+                    var request = UpdateUserHimselfRequest.builder()
+                            .username(StringUtils.repeat("*", 30))
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(put("/v1/user/self")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isOk());
+                }
+
+                @Test
+                @WithUserMock
+                public void usernameLongerThanLimitLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = UpdateUserHimselfRequest.builder()
+                            .username(StringUtils.repeat("*", 31))
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(put("/v1/user/self")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Username must be between 1 and 30 characters"));
+                }
+            }
         }
     }
 

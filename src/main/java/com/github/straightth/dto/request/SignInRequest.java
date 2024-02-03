@@ -1,6 +1,7 @@
 package com.github.straightth.dto.request;
 
-import jakarta.validation.constraints.NotEmpty;
+import com.github.straightth.util.Constants;
+import jakarta.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -10,8 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class SignInRequest {
 
-    @NotEmpty
+    @Email(regexp = Constants.Regexp.EMAIL_REGEXP, message = "{taskl.validation.user.email-format}")
     String email;
-    @NotEmpty
     String password;
 }

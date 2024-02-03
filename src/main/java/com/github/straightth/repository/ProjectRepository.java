@@ -10,7 +10,5 @@ public interface ProjectRepository extends MongoRepository<Project, String> {
 
     Collection<Project> findProjectsByMemberUserIdsContains(String userId);
 
-    Optional<Project> findProjectByIdAndMemberUserIdsContains(String projectId, String userId);
-
     Set<Project> findProjectsByIdInAndMemberUserIdsContains(Collection<String> projectIds, String userId);
 }

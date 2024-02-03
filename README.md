@@ -1,6 +1,4 @@
 To-Do:
-- AuthenticationController test
-- DI through configuration classes
 - Rich README (overview, technologies, how to start, implementation and key features in it, todo)
 
 ---
@@ -28,6 +26,7 @@ Simply run `docker-compose up` then observe an API through Springdoc Swagger UI:
 - Mustache for templating error messages
 - JUnit as a main framework for testing
 - AssertJ for writing concise tests
+- Docker Compose for convenience of infrastructure and start-up in click
 
 ## Tests
 
@@ -37,10 +36,15 @@ Pure unit-tests are omitted in favor of integration tests with embedded database
 
 TODO: describe each feature, add links to files
 
-- ErrorFactory
-- CI/CD with checkstyle
-- AccessService
-- Multi cluster embedded Mongo
+### Error factory
+
+### Access service
+
+### Multi cluster embedded Mongo
+
+### CI/CD with Checkstyle
+
+GitHub's workflows ensure that codebase and business logic are kept in healthy state by running tests and Checkstyle lint on every PR
 
 ## To-Do
 - Lombok -> Kotlin for interoperability wih Kotlin

@@ -17,7 +17,6 @@ import com.github.straightth.repository.TaskRepository;
 import com.github.straightth.repository.UserRepository;
 import com.github.straightth.util.TestEntityFactory;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
@@ -27,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class TaskControllerTest extends MockMvcAbstractTest {
-
-    private static final String RANDOM_UUID = UUID.randomUUID().toString();
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -327,7 +324,6 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                                     .value("Task name must be between 1 and 30 characters"));
                 }
 
-                //TODO: think about it
                 @Test
                 @WithUserMock
                 public void nullInNameLeadsTo400() throws Exception {
