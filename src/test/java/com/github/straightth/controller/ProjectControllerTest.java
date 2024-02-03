@@ -16,7 +16,6 @@ import com.github.straightth.repository.ProjectRepository;
 import com.github.straightth.repository.UserRepository;
 import com.github.straightth.util.TestEntityFactory;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
@@ -26,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class ProjectControllerTest extends MockMvcAbstractTest {
-
-    private static final String RANDOM_UUID = UUID.randomUUID().toString();
 
     @Autowired
     private UserRepository userRepository;
@@ -213,6 +210,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nullInNameLeadsTo400() throws Exception {
                     //Arrange
+                    @SuppressWarnings("DataFlowIssue")
                     var request = CreateProjectRequest.builder()
                             .name(null)
                             .build();
@@ -313,6 +311,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
             @WithUserMock
             public void nullInDescriptionLeadsTo400() throws Exception {
                 //Arrange
+                @SuppressWarnings("DataFlowIssue")
                 var request = CreateProjectRequest.builder()
                         .description(null)
                         .build();

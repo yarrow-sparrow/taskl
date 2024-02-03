@@ -2,8 +2,9 @@ package com.github.straightth.controller;
 
 import com.github.straightth.dto.request.SignInRequest;
 import com.github.straightth.dto.request.SignUpRequest;
-import com.github.straightth.dto.response.AuthenticationResponse;
+import com.github.straightth.dto.response.SignInResponse;
 import com.github.straightth.service.authentication.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,12 +20,12 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/sign-up")
-    public void signUp(@RequestBody SignUpRequest request) {
+    public void signUp(@RequestBody @Valid SignUpRequest request) {
         authenticationService.signUp(request);
     }
 
     @PostMapping("/sign-in")
-    public AuthenticationResponse signIn(@RequestBody SignInRequest request) {
+    public SignInResponse signIn(@RequestBody @Valid SignInRequest request) {
         return authenticationService.signIn(request);
     }
 }

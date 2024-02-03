@@ -28,12 +28,12 @@ public interface ErrorFactory {
     ApplicationError validationFailed(String message);
 
     @ErrorTemplate(
-            code = "taskl.api.error.authentication.user-exists",
+            code = "taskl.api.error.authentication.email-already-in-use",
             httpStatus = HttpStatus.CONFLICT,
-            summary = "User already exists",
-            message = "User already exists"
+            summary = "Email already in use",
+            message = "Email already in use"
     )
-    ApplicationError userAlreadyExists();
+    ApplicationError emailAlreadyInUse();
 
     @ErrorTemplate(
             code = "taskl.api.error.authentication.no-user-with-such-email",

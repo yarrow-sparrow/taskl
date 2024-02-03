@@ -9,6 +9,13 @@ import org.springframework.security.test.context.support.WithSecurityContext;
 public @interface WithUserMock {
 
     String username() default "username";
+
     String email() default "email@email.com";
+
     String encodedPassword() default "password";
+
+    /**
+     * This method has priority over encoded password because PasswordEncoder is applied to it
+     */
+    String rawPassword() default "";
 }
