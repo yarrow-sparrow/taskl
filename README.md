@@ -1,58 +1,130 @@
-To-Do:
-- Rich README (overview, technologies, how to start, implementation and key features in it, todo)
-
----
-
 # Taskl
 
 ## Overview
 
-Taskl is a task manager RESTful API written mostly in Java for demonstration purpose.
-The application idea is to keep it simple stupid and focus on implementation quality, security and infrastructure richness.
-As a part of it there are only 3 domain entities in which business logic lies within CRUD operations.
-Current implementation allows to easily expand quantity of features to any business requirements maintaining quality of product due to well-prepared code and infrastructure base.
+Taskl is a Java-based task manager RESTful API designed to demonstrate high-quality software development practices.
+It emphasizes simplicity ("keep it simple stupid" principle), robust security, and a rich infrastructure.
+Despite having only three domain entities, Taskl is engineered for easy expansion to any business requirements while preserving product and its codebase quality.
 
-## How to run it?
+## Getting Started
 
-Simply run `docker-compose up` then observe an API through Springdoc Swagger UI: http://localhost:8080/api/swagger-ui/index.html
+1. To launch Taskl, execute `docker-compose up` from project's root directory.
+2. Once running, you can access the Springdoc Swagger UI at http://localhost:8080/api/swagger-ui/index.html to interact with the API.
 
 ## Technologies
 
-- Spring Boot as a main framework for creating rich and robust API
-- Lombok for reducing boilerplate, migration to Kotlin is planned
-- MapStruct for mapping entity to DTO
-- Embedded MongoDB for running transactional multi-cluster MongoDB on local startup and inside tests for simplicity
-- Guava is used for multimap and other utils
-- Mustache for templating error messages
-- JUnit as a main framework for testing
-- AssertJ for writing concise tests
-- Docker Compose for convenience of infrastructure and start-up in click
+- **Spring Boot**: Main framework for API functionality.
+- **Lombok**: Used to minimize boilerplate; transition to Kotlin for better interoperability is planned.
+- **MapStruct**: Facilitates the mapping between entity and DTO layers.
+- **Embedded MongoDB**: Supports transactional operations in a multi-cluster setup for local development and testing.
+- **Guava**: Provides additional utilities, such as multimap.
+- **Mustache**: Enables dynamic error message templating.
+- **JUnit & AssertJ**: Allows to write expressive Java tests.
+- **Docker Compose**: Simplifies infrastructure setup and project start-up.
 
-## Tests
+## Key Features
 
-Pure unit-tests are omitted in favor of integration tests with embedded database because slight different in performance considered cheaper than reliability and integrity improvement.
+### Error Factory
 
-## Key-features
+The Error Factory streamlines the creation of standardized business logic errors.
+By making error generation declarative, it simplifies the development process.
+Below is an example of defining an error template:
+```java
+@ErrorTemplate(
+    id = "taskl.api.error.validation-failed",
+    httpStatus = HttpStatus.BAD_REQUEST,
+    summary = "Validation failed",
+    message = "{{message}}"
+)
+ApplicationError validationFailed(String message);
+```
 
-TODO: describe each feature, add links to files
+This template produces an ApplicationError object:
+```java
+public class ApplicationError {
+    String code;
+    HttpStatus httpStatus;
+    String summary;
+    String message;
+}
+```
 
-### Error factory
+Error Factory is implemented as a singleton to ensure that application-wide errors are consistently accessible.
+To create a specific error `ErrorFactory.get().specificError()` has to be called:
+```java
+void signUp(SignUpRequest request) {
+    if (userRepository.existsUserByEmail(request.getEmail())) {
+        throw ErrorFactory.get().emailAlreadyInUse();
+    }
+    //More code
+}
+```
 
-### Access service
+The centralization of error handling is further enhanced by a common method that builds the response based on the generated error:
+```java
+@ExceptionHandler(ApplicationError.class)
+public ResponseEntity<ErrorResponse> applicationErrorHandler(ApplicationError e) {
+    return ResponseEntity.status(e.getHttpStatus().value()).body(e.toResponse());
+}
+```
 
-### Multi cluster embedded Mongo
+This uniform approach to error management reduces boilerplate and ensures clarity and consistency in how errors are communicated throughout the application.
+
+### Access Service
+
+The Access Service API empowers consistent and secure access to entities:
+```java
+EntityT getPresentOrThrow(IdT id);
+
+Collection<EntityT> getPresentOrThrow(Collection<IdT> ids);
+```
+
+It also offers a Secured version of methods which allows to control entity visibility to user:
+```java
+EntityT getPresentOrThrowSecured(IdT id);
+```
+
+Well-tested base class allows user to implement the service by defining only two access function and one factory method:
+```java
+@Override
+public Function<Collection<String>, Collection<Project>> defaultAccessFunction() {
+    return projectRepository::findAllById;
+}
+
+@Override
+public Function<Collection<String>, Collection<Project>> securedAccessFunction() {
+    return projectIds -> {
+        var currentUserId = SecurityUtil.getCurrentUserId();
+        return projectRepository.findProjectsByIdInAndMemberUserIdsContains(projectIds, currentUserId);
+    };
+}
+
+@Override
+public Supplier<ApplicationError> notFoundExceptionSupplier() {
+    return ErrorFactory.get()::projectNotFound;
+}
+```
+
+### Embedded Multi-Cluster MongoDB
+
+This setup enhances developer experience by simplifying local setup and supporting transactional operations without the need for a Docker daemon.
 
 ### CI/CD with Checkstyle
 
-GitHub's workflows ensure that codebase and business logic are kept in healthy state by running tests and Checkstyle lint on every PR
+GitHub's workflows are used to maintain code quality, running tests and lint checks on every pull request to ensure the health of the codebase.
 
-## To-Do
-- Lombok -> Kotlin for interoperability wih Kotlin
-- Migrate Gradle to Kotlin
-- Jakarta violation response formatting: https://blog.payara.fish/returning-beautiful-validation-error-messages-in-jakarta-rest-with-exception-mappers
-- Prettify render of ConstraintViolationException and null exceptions
-- Sonar workflow
-- Jacoco workflow with automatic coverage count
-- Environment-based configuration: standalone MongoDB cluster through Docker Compose
-- Deploy to Google Cloud
-- OAuth 2 security options
+## Testing Strategy
+
+- Test suite achieves 87% line coverage and 91% method coverage.
+- Integration tests are prioritized over pure unit tests to ensure reliability and system integrity.
+- Each test running in a separate transaction for isolation.
+
+## Roadmap
+
+- Migrate from Lombok to Kotlin for enhanced language features and interoperability.
+- Transition build scripts to Kotlin DSL for Gradle.
+- Integrate SonarQube for continuous code quality checks.
+- Implement a Jacoco workflow for automated coverage reporting.
+- Configure environment-specific database setups, including a standalone MongoDB cluster.
+- Plan deployment to Google Cloud and manage infrastructure as code with Terraform.
+- Expand OAuth 2.0 registration options for enhanced security.

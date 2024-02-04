@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionHandlingAdvice {
 
     /**
-     * Here we're getting http code from threw error so ResponseEntity is needed
+     * Here we're getting http code from threw error so only ResponseEntity is needed
      */
     @ExceptionHandler(ApplicationError.class)
     public ResponseEntity<ErrorResponse> applicationErrorHandler(ApplicationError e) {

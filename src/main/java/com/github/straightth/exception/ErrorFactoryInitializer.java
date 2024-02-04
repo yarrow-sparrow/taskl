@@ -93,7 +93,7 @@ public class ErrorFactoryInitializer {
         }
 
         return new ApplicationError(
-                annotation.code(),
+                annotation.id(),
                 annotation.httpStatus(),
                 annotation.summary(),
                 annotation.level(),
