@@ -26,7 +26,7 @@ Despite having only three domain entities, Taskl is engineered for easy expansio
 
 ### Error Factory
 
-The Error Factory streamlines the creation of standardized business logic errors.
+[The Error Factory](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/exception/ErrorFactory.java#L8) streamlines the creation of standardized business logic errors.
 By making error generation declarative, it simplifies the development process.
 Below is an example of defining an error template:
 ```java
@@ -39,7 +39,7 @@ Below is an example of defining an error template:
 ApplicationError validationFailed(String message);
 ```
 
-This template produces an ApplicationError object:
+This template produces an [ApplicationError](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/exception/ApplicationError.java#L14) object:
 ```java
 public class ApplicationError {
     String code;
@@ -50,7 +50,7 @@ public class ApplicationError {
 ```
 
 Error Factory is implemented as a singleton to ensure that application-wide errors are consistently accessible.
-To create a specific error `ErrorFactory.get().specificError()` has to be called:
+To [create a specific error](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/service/authentication/AuthenticationService.java#L29) `ErrorFactory.get().specificError()` has to be called:
 ```java
 void signUp(SignUpRequest request) {
     if (userRepository.existsUserByEmail(request.getEmail())) {
@@ -60,7 +60,7 @@ void signUp(SignUpRequest request) {
 }
 ```
 
-The centralization of error handling is further enhanced by a common method that builds the response based on the generated error:
+The centralization of error handling is further enhanced by a [common method](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/controller/ExceptionHandlingAdvice.java#L27) that builds the response based on the generated error:
 ```java
 @ExceptionHandler(ApplicationError.class)
 public ResponseEntity<ErrorResponse> applicationErrorHandler(ApplicationError e) {
@@ -72,7 +72,7 @@ This uniform approach to error management reduces boilerplate and ensures clarit
 
 ### Access Service
 
-The Access Service API empowers consistent and secure access to entities:
+[The Access Service](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/service/access/AccessService.java#L15) API empowers consistent and secure access to entities:
 ```java
 EntityT getPresentOrThrow(IdT id);
 
@@ -84,7 +84,7 @@ It also offers a Secured version of methods which allows to control entity visib
 EntityT getPresentOrThrowSecured(IdT id);
 ```
 
-Well-tested base class allows user to implement the service by defining only two access function and one factory method:
+Well-tested base class allows user to implement [the service](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/service/project/ProjectAccessService.java#L18) by defining only two access function and one factory method:
 ```java
 @Override
 public Function<Collection<String>, Collection<Project>> defaultAccessFunction() {

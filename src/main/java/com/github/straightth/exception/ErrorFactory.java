@@ -30,8 +30,8 @@ public interface ErrorFactory {
     @ErrorTemplate(
             id = "taskl.api.error.authentication.email-already-in-use",
             httpStatus = HttpStatus.CONFLICT,
-            summary = "Email already in use",
-            message = "Email already in use"
+            summary = "Email already in use by an existing account",
+            message = "Email already in use by an existing account"
     )
     ApplicationError emailAlreadyInUse();
 
