@@ -38,3 +38,6 @@ replay_pid*
 
 # Mac
 .DS_Store
+
+# Codegen
+src/main/generated
