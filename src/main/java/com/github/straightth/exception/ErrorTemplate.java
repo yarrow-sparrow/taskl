@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @Target(ElementType.METHOD)
 @interface ErrorTemplate {
 
-    String code();
+    String id();
 
     HttpStatus httpStatus();
 
