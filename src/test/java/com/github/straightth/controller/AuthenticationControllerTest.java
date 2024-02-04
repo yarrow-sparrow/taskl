@@ -83,7 +83,7 @@ public class AuthenticationControllerTest extends MockMvcAbstractTest {
             //Assert
             result.andExpect(status().isConflict())
                     .andExpect(jsonPath("$.message")
-                            .value("Email already in use"));
+                            .value("Email already in use by an existing account"));
         }
 
         @Nested
