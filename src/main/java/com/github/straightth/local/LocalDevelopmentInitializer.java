@@ -28,7 +28,7 @@ public class LocalDevelopmentInitializer {
     public void generateToken() {
         var username = "local-developer";
         var password = "local-developer";
-        var email = "local@developer.com";
+        var email = "local@development.com";
 
         if (!userRepository.existsUserByEmail(email)) {
             var request = SignUpRequest.builder().username(username).email(email).password(password).build();
