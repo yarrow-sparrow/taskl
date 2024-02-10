@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -24,6 +25,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
 
+    @Transactional
     public void signUp(SignUpRequest request) {
         if (userRepository.existsUserByEmail(request.getEmail())) {
             throw ErrorFactory.get().emailAlreadyInUse();
