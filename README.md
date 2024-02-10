@@ -8,8 +8,9 @@ Despite having only three domain entities, Taskl is engineered for easy expansio
 
 ## Getting Started
 
-1. To launch Taskl, execute `docker-compose up` from project's root directory.
-2. Once running, you can access the Springdoc Swagger UI at http://localhost:8080/api/swagger-ui/index.html to interact with the API.
+1. In the project's root directory, run `docker-compose up --build` to start the application.
+2. Open the Springdoc Swagger UI at http://localhost:8080/api/swagger-ui/index.html to explore and interact with the API endpoints.
+3. For quick access, locate the pre-generated authentication token in the application logs by searching for "Token for local start-up". Alternatively, use the Authentication endpoints in the Swagger UI to manually sign in and obtain a token.
 
 ## Technologies
 
