@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+/**
+ * Initializer for easier access to protected endpoints
+ * Creates user and prints its token to logs
+ */
 @Slf4j
 @Profile("development")
 @Component
@@ -21,10 +25,10 @@ public class LocalDevelopmentInitializer {
     private final UserRepository userRepository;
 
     @PostConstruct
-    public void initLocalDevelopment() {
-        var username = "local-development";
-        var password = "local-development";
-        var email = "local@development.com";
+    public void generateToken() {
+        var username = "local-developer";
+        var password = "local-developer";
+        var email = "local@developer.com";
 
         if (!userRepository.existsUserByEmail(email)) {
             var request = SignUpRequest.builder().username(username).email(email).password(password).build();
@@ -34,6 +38,6 @@ public class LocalDevelopmentInitializer {
         var request = SignInRequest.builder().email(email).password(password).build();
         var token = authenticationService.signIn(request);
 
-        log.info("Token for local development: {}", token.getToken());
+        log.info("Token for local start-up: {}", token.getToken());
     }
 }
