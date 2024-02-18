@@ -17,7 +17,7 @@ public class TestEntityFactory {
         return User.builder()
                 .username("user")
                 .email("user@email.com")
-                .password("password")
+                .password("P@ssw0rd")
                 .build();
     }
 

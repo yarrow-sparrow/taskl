@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.github.straightth.MockMvcAbstractTest;
 import com.github.straightth.authentication.WithUserMock;
 import com.github.straightth.domain.User;
+import com.github.straightth.dto.request.SignUpRequest;
 import com.github.straightth.dto.request.UpdateUserHimselfRequest;
 import com.github.straightth.repository.UserRepository;
 import com.github.straightth.util.TestEntityFactory;
@@ -18,11 +19,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserControllerTest extends MockMvcAbstractTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Nested
     class GetUserById {
@@ -88,15 +92,16 @@ public class UserControllerTest extends MockMvcAbstractTest {
             //Arrange
             var request = UpdateUserHimselfRequest.builder()
                     .username("newUsername")
+                    .email("new@email.com")
+                    .password("newpas3w@rD")
                     .phoneNumber("+1")
                     .build();
 
             var expectedUserId = getMockedUserId();
             var expectedUser = User.builder()
                     .id(expectedUserId)
-                    .email("explicit@email.com")
                     .username("newUsername")
-                    .password("explicitPassword")
+                    .email("new@email.com")
                     .phoneNumber("+1")
                     .build();
 
@@ -108,12 +113,16 @@ public class UserControllerTest extends MockMvcAbstractTest {
             //Assert
             result.andExpect(status().isOk())
                     .andExpect(jsonPath("$.username").value("newUsername"))
+                    .andExpect(jsonPath("$.email").value("new@email.com"))
                     .andExpect(jsonPath("$.phoneNumber").value("+1"));
 
-            var user = userRepository.findByEmail("explicit@email.com").orElseThrow();
+            var user = userRepository.findByEmail("new@email.com").orElseThrow();
             Assertions.assertThat(user)
                     .usingRecursiveComparison()
+                    .ignoringFields("password")
                     .isEqualTo(expectedUser);
+            Assertions.assertThat(passwordEncoder.matches("newpas3w@rD", user.getPassword()))
+                    .isTrue();
         }
 
         @Test
@@ -139,12 +148,34 @@ public class UserControllerTest extends MockMvcAbstractTest {
             //Assert
             result.andExpect(status().isOk())
                     .andExpect(jsonPath("$.username").value("explicitUsername"))
+                    .andExpect(jsonPath("$.email").value("explicit@email.com"))
                     .andExpect(jsonPath("$.phoneNumber").isEmpty());
 
             var user = userRepository.findByEmail("explicit@email.com").orElseThrow();
             Assertions.assertThat(user)
                     .usingRecursiveComparison()
                     .isEqualTo(expectedUser);
+        }
+
+        @Test
+        @WithUserMock(email = "explicit@email.com")
+        public void alreadyUsedEmailLeadsTo409() throws Exception {
+            //Arrange
+            createUser(u -> u.setEmail("new@email.com"));
+            var request = SignUpRequest.builder()
+                    .email("new@email.com")
+                    .build();
+
+            //Act
+            var result = mockMvc.perform(put("/v1/user/self")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            );
+
+            //Assert
+            result.andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.message")
+                            .value("Email already in use by an existing account"));
         }
 
         @Nested
@@ -227,6 +258,71 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     result.andExpect(status().isBadRequest())
                             .andExpect(jsonPath("$.message")
                                     .value("Username must be between 1 and 30 characters"));
+                }
+            }
+
+            @Nested
+            class Email {
+
+                @Test
+                @WithUserMock
+                public void emptyEmailLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = UpdateUserHimselfRequest.builder().email("").build();
+
+                    //Act
+                    var result = mockMvc.perform(put("/v1/user/self")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Email must be valid in format, example: tomas@gmail.com"));
+                }
+
+                @Test
+                @WithUserMock
+                public void invalidEmailLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = UpdateUserHimselfRequest.builder().email("invalid-email.").build();
+
+                    //Act
+                    var result = mockMvc.perform(put("/v1/user/self")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Email must be valid in format, example: tomas@gmail.com"));
+                }
+            }
+
+            @Nested
+            class Password {
+
+                @Test
+                @WithUserMock
+                public void notEnoughSecuredPasswordLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = UpdateUserHimselfRequest.builder().password("password").build();
+
+                    //Act
+                    var result = mockMvc.perform(put("/v1/user/self")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Password must have minimum eight characters, "
+                                            + "at least one upper case English letter, one lower case English letter, "
+                                            + "one number and one special character"
+                                    ));
                 }
             }
         }
