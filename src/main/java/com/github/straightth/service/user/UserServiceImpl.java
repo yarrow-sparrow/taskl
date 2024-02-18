@@ -2,12 +2,14 @@ package com.github.straightth.service.user;
 
 import com.github.straightth.dto.request.UpdateUserHimselfRequest;
 import com.github.straightth.dto.response.UserResponse;
+import com.github.straightth.exception.ErrorFactory;
 import com.github.straightth.mapper.user.UserMapper;
 import com.github.straightth.repository.UserRepository;
 import com.github.straightth.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +19,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final UserAccessService userPresenceService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponse getUserById(String userId) {
@@ -39,6 +42,17 @@ public class UserServiceImpl implements UserService {
         var username = request.getUsername();
         if (StringUtils.isNotBlank(username)) {
             user.setUsername(username);
+        }
+        var email = request.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            if (userRepository.existsUserByEmail(email)) {
+                throw ErrorFactory.get().emailAlreadyInUse();
+            }
+            user.setEmail(email);
+        }
+        var password = request.getPassword();
+        if (StringUtils.isNotBlank(password)) {
+            user.setPassword(passwordEncoder.encode(password));
         }
         var phoneNumber = request.getPhoneNumber();
         if (StringUtils.isNotBlank(phoneNumber)) {
