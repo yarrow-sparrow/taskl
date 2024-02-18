@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Builder
 @Document
-public class Task {
+public class Task implements MongoDocument {
 
     @Id
     private String id;

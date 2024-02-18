@@ -85,7 +85,7 @@ It also offers a Secured version of methods which allows to control entity visib
 EntityT getPresentOrThrowSecured(IdT id);
 ```
 
-Well-tested base class allows user to implement [the service](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/service/project/ProjectAccessService.java#L18) by defining only two access function and one factory method:
+Well-tested base class simplifies [service implementation](https://github.com/straightth/taskl/blob/main/src/main/java/com/github/straightth/service/project/ProjectAccessService.java#L18), requiring just two access functions and a factory method:
 ```java
 @Override
 public Function<Collection<String>, Collection<Project>> defaultAccessFunction() {
@@ -109,6 +109,14 @@ public Supplier<ApplicationError> notFoundExceptionSupplier() {
 ### Embedded Multi-Cluster MongoDB
 
 This setup enhances developer experience by simplifying local setup and supporting transactional operations without the need for a Docker daemon.
+
+### UUID v7 as Entity ID
+
+UUID v7 is utilized for entity identification to boost security and performance.
+The benefits include:
+- **Temporal Sequencing**: Adds a timestamp to each ID for chronological sorting and improved database indexing efficiency.
+- **Reduced Collision Risk**: The unique structure of UUID v7 lowers the chance of ID collisions, ensuring greater data integrity.
+- **Performance Efficiency**: Offers fast performance similar to MongoDB ObjectId, for more see [UUID7 vs UUID4 Performance Analysis](https://medium.com/@rtawadrous/why-uuid7-is-better-than-uuid4-as-clustered-index-edb02bf70056), [ID Generation Benchmarks](https://github.com/sokil/id-bench)
 
 ### CI/CD with Checkstyle
 
