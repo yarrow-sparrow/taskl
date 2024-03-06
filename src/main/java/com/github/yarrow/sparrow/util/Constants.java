@@ -9,5 +9,6 @@ public class Constants {
     public class Regexp {
         public static final String EMAIL_REGEXP = "[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+";
         public static final String PASSWORD_REGEXP = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$";
+        public static final String KEY_REGEXP = "^[a-zA-Z]+$";
     }
 }

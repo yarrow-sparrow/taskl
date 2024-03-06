@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
-@RequestMapping("/v1/task")
+@RequestMapping("/v1/tasks")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class TaskController {
 

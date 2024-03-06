@@ -39,10 +39,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         var jwt = authHeader.substring(7);
-
         var userId = jwtService.extractId(jwt);
-        var user = userRepository.findById(userId).orElseThrow();
 
+        var userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        var user = userOptional.get();
         if (SecurityContextHolder.getContext().getAuthentication() == null
                 && StringUtils.isNotEmpty(userId)
                 && jwtService.isTokenValid(jwt, user)

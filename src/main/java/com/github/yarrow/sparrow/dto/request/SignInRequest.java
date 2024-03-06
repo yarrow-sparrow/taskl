@@ -11,7 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class SignInRequest {
 
-    @Email(regexp = Constants.Regexp.EMAIL_REGEXP, message = "{taskl.validation.user.email-format}")
+    @Email(regexp = Constants.Regexp.EMAIL_REGEXP, message = "{taskl.validation.user.email.pattern}")
     String email;
     String password;
 }

@@ -1,12 +1,18 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   data:
     mongodb:
       host: localhost
       port: 27017
       database: taskl
+
 taskl:
   jwt:
     signing-key: VW1AHxycm69njF5s03rJP1LJONX0EGh6rgsbc4fehAaqYR6gcx
+  enable:
+    # noinspection SpringBootApplicationYaml
+    system-clock: false
 de:
   flapdoodle:
     mongodb:

@@ -114,9 +114,9 @@ This setup enhances developer experience by simplifying local setup and supporti
 
 UUID v7 is utilized for entity identification to boost security and performance.
 The benefits include:
-- **Temporal Sequencing**: Adds a timestamp to each ID for chronological sorting and improved database indexing efficiency.
-- **Reduced Collision Risk**: The unique structure of UUID v7 lowers the chance of ID collisions, ensuring greater data integrity.
-- **Performance Efficiency**: Offers fast performance similar to MongoDB ObjectId, for more see [UUID7 vs UUID4 Performance Analysis](https://medium.com/@rtawadrous/why-uuid7-is-better-than-uuid4-as-clustered-index-edb02bf70056), [ID Generation Benchmarks](https://github.com/sokil/id-bench)
+- **Reduced Collision Risk**: The unique structure of UUID v7 lowers the chance of ID collisions, reducing security risks.
+- **Temporal Sequencing**: Adds a timestamp to each ID for chronological sorting, maintaining database indexing efficiency.
+- **Performance Efficiency**: Offers fast performance similar to MongoDB ObjectId, for more see [UUID7 vs UUID4 Performance Analysis](https://medium.com/@rtawadrous/why-uuid7-is-better-than-uuid4-as-clustered-index-edb02bf70056), [ID Generation Benchmarks](https://github.com/sokil/id-bench).
 
 ### CI/CD with Checkstyle
 

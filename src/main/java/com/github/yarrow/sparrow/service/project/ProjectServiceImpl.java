@@ -8,8 +8,8 @@ import com.github.yarrow.sparrow.mapper.project.ProjectMapper;
 import com.github.yarrow.sparrow.repository.ProjectRepository;
 import com.github.yarrow.sparrow.service.user.UserAccessService;
 import com.github.yarrow.sparrow.util.SecurityUtil;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +27,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public ProjectResponse createProject(CreateProjectRequest request) {
+    public ProjectResponse saveProject(CreateProjectRequest request) {
         var project = projectMapper.createProjectRequestToProject(request);
 
-        var memberUserIds = new ArrayList<>(request.getMemberUserIds());
-        userPresenceService.validatePresenceOrThrow(memberUserIds);
+        //Capitalizing key
+        project.setKey(project.getKey().toUpperCase());
 
-        //Adding user to created project
+        //Adding current user to created project
         var currentUserId = SecurityUtil.getCurrentUserId();
-        memberUserIds.add(currentUserId);
-        project.setMemberUserIds(memberUserIds);
+        project.setMemberUserIds(List.of(currentUserId));
 
         project = projectRepository.save(project);
         return projectMapper.projectToProjectResponse(project);
@@ -45,21 +44,21 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Collection<ProjectShortResponse> getUserProjects() {
         var currentUserId = SecurityUtil.getCurrentUserId();
-        var projects = projectRepository.findProjectsByMemberUserIdsContains(currentUserId);
+        var projects = projectRepository.findAllByMemberUserIdsContains(currentUserId);
         return projectMapper.projectsToProjectShortResponses(projects);
     }
 
     @Override
-    public ProjectResponse getProjectById(String projectId) {
-        var project = projectAccessService.getPresentOrThrowSecured(projectId);
+    public ProjectResponse getProjectByIdOrKey(String projectIdOrKey) {
+        var project = projectAccessService.getPresentOrThrowSecured(projectIdOrKey);
         return projectMapper.projectToProjectResponse(project);
     }
 
     @Transactional
     @Override
-    public ProjectResponse updateProjectById(String projectId, UpdateProjectRequest request) {
+    public ProjectResponse updateProjectByIdOrKey(String projectIdOrKey, UpdateProjectRequest request) {
         //noinspection DuplicatedCode: similar fields and update approach with Task, but different entities
-        var project = projectAccessService.getPresentOrThrowSecured(projectId);
+        var project = projectAccessService.getPresentOrThrowSecured(projectIdOrKey);
 
         var name = request.getName();
         if (StringUtils.isNotBlank(name)) {

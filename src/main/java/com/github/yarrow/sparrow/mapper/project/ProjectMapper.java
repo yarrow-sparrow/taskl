@@ -20,5 +20,9 @@ public interface ProjectMapper {
     ProjectResponse projectToProjectResponse(Project project);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "createdTs", ignore = true)
+    @Mapping(target = "updatedTs", ignore = true)
+    @Mapping(target = "memberUserIds", ignore = true)
     Project createProjectRequestToProject(CreateProjectRequest request);
 }

@@ -1,7 +1,11 @@
 package com.github.yarrow.sparrow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.yarrow.sparrow.config.FixedClockConfig;
 import com.github.yarrow.sparrow.util.SecurityUtil;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @ActiveProfiles("test")
-@SpringBootTest
+@SpringBootTest(classes = FixedClockConfig.class)
 @AutoConfigureMockMvc
 @Transactional
 public abstract class MockMvcAbstractTest {
@@ -22,8 +26,14 @@ public abstract class MockMvcAbstractTest {
 
     @Autowired
     protected MockMvc mockMvc;
+    @Autowired
+    protected Clock clock;
 
     protected String getMockedUserId() {
         return SecurityUtil.getCurrentUserId();
+    }
+
+    protected Instant getClockTsMillis() {
+        return clock.instant().truncatedTo(ChronoUnit.MILLIS);
     }
 }

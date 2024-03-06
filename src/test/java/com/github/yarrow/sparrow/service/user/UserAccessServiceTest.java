@@ -20,7 +20,7 @@ public class UserAccessServiceTest extends MockMvcAbstractTest {
     @Test
     public void userIsReturned() {
         //Arrange
-        var expectedUserId = createUser(u -> {
+        var expectedUserId = saveUser(u -> {
             u.setUsername("Expected user");
             u.setEmail("expected@email.com");
             u.setPassword("salted-password");
@@ -40,7 +40,7 @@ public class UserAccessServiceTest extends MockMvcAbstractTest {
         Assertions.assertThat(user).isEqualTo(expectedUser);
     }
 
-    private String createUser(Consumer<User> preconfigure) {
+    private String saveUser(Consumer<User> preconfigure) {
         var user = TestEntityFactory.createUser();
         preconfigure.accept(user);
         return userRepository.save(user).getId();

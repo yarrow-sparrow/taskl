@@ -13,11 +13,11 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class UpdateTaskRequest {
 
-    @Size(min = 1, max = 30, message = "{taskl.validation.task.name-length}")
+    @Size(min = 1, max = 30, message = "{taskl.validation.task.name.length}")
     @Nullable
     String name;
 
-    @Size(min = 1, max = 300, message = "{taskl.validation.task.description-length}")
+    @Size(min = 1, max = 300, message = "{taskl.validation.task.description.length}")
     @Nullable
     String description;
 

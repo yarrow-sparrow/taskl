@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +22,31 @@ public class ProjectAccessService extends AbstractAccessService<Project, String,
 
     @Override
     public Function<Collection<String>, Collection<Project>> defaultAccessFunction() {
-        return projectRepository::findAllById;
+        return projectIds -> {
+            //Querying by ids
+            var projects = projectRepository.findAllById(projectIds);
+            if (CollectionUtils.isNotEmpty(projects)) {
+                return projects;
+            }
+
+            //If no projects by ids found, querying by keys
+            return projectRepository.findAllByKeyIn(projectIds);
+        };
     }
 
     @Override
     public Function<Collection<String>, Collection<Project>> securedAccessFunction() {
         return projectIds -> {
             var currentUserId = SecurityUtil.getCurrentUserId();
-            return projectRepository.findProjectsByIdInAndMemberUserIdsContains(projectIds, currentUserId);
+
+            //Querying by ids
+            var projects = projectRepository.findAllByIdInAndMemberUserIdsContains(projectIds, currentUserId);
+            if (CollectionUtils.isNotEmpty(projects)) {
+                return projects;
+            }
+
+            //If no projects by ids found, querying by keys
+            return projectRepository.findAllByKeyInAndMemberUserIdsContains(projectIds, currentUserId);
         };
     }
 

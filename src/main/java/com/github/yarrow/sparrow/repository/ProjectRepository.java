@@ -7,7 +7,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ProjectRepository extends MongoRepository<Project, String> {
 
-    Collection<Project> findProjectsByMemberUserIdsContains(String userId);
+    Collection<Project> findAllByMemberUserIdsContains(String userId);
 
-    Set<Project> findProjectsByIdInAndMemberUserIdsContains(Collection<String> projectIds, String userId);
+    Set<Project> findAllByIdInAndMemberUserIdsContains(Collection<String> projectIds, String userId);
+
+    Collection<Project> findAllByKeyIn(Collection<String> projectKeys);
+
+    Collection<Project> findAllByKeyInAndMemberUserIdsContains(Collection<String> projectKeys, String userId);
 }

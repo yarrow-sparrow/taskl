@@ -35,11 +35,11 @@ public class UserControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void getUserById() throws Exception {
             //Arrange
-            var expectedUserId = createUser(u -> u.setUsername("Expected user"));
-            createUser(u -> u.setUsername("Another user"));
+            var expectedUserId = saveUser(u -> u.setUsername("Expected user"));
+            saveUser(u -> u.setUsername("Another user"));
 
             //Act
-            var result = mockMvc.perform(get("/v1/user/{userId}", expectedUserId));
+            var result = mockMvc.perform(get("/v1/users/{userId}", expectedUserId));
 
             //Assert
             result.andExpect(status().isOk())
@@ -51,11 +51,11 @@ public class UserControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nonexistentUserLeadsTo404() throws Exception {
             //Arrange
-            createUser(u -> u.setUsername("User 1"));
-            createUser(u -> u.setUsername("User 2"));
+            saveUser(u -> u.setUsername("User 1"));
+            saveUser(u -> u.setUsername("User 2"));
 
             //Act
-            var result = mockMvc.perform(get("/v1/user/{userId}", RANDOM_UUID));
+            var result = mockMvc.perform(get("/v1/users/{userId}", RANDOM_UUID));
 
             //Assert
             result.andExpect(status().isNotFound())
@@ -73,7 +73,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
             var expectedUserId = getMockedUserId();
 
             //Act
-            var result = mockMvc.perform(get("/v1/user/self"));
+            var result = mockMvc.perform(get("/v1/users/self"));
 
             //Assert
             result.andExpect(status().isOk())
@@ -106,7 +106,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/user/self")
+            var result = mockMvc.perform(put("/v1/users/self")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)));
 
@@ -141,7 +141,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/user/self")
+            var result = mockMvc.perform(put("/v1/users/self")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)));
 
@@ -161,13 +161,13 @@ public class UserControllerTest extends MockMvcAbstractTest {
         @WithUserMock(email = "explicit@email.com")
         public void alreadyUsedEmailLeadsTo409() throws Exception {
             //Arrange
-            createUser(u -> u.setEmail("new@email.com"));
+            saveUser(u -> u.setEmail("new@email.com"));
             var request = SignUpRequest.builder()
                     .email("new@email.com")
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/user/self")
+            var result = mockMvc.perform(put("/v1/users/self")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -193,7 +193,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/user/self")
+                    var result = mockMvc.perform(put("/v1/users/self")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -213,7 +213,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/user/self")
+                    var result = mockMvc.perform(put("/v1/users/self")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -231,7 +231,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/user/self")
+                    var result = mockMvc.perform(put("/v1/users/self")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -249,7 +249,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/user/self")
+                    var result = mockMvc.perform(put("/v1/users/self")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -271,7 +271,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     var request = UpdateUserHimselfRequest.builder().email("").build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/user/self")
+                    var result = mockMvc.perform(put("/v1/users/self")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -279,7 +279,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     //Assert
                     result.andExpect(status().isBadRequest())
                             .andExpect(jsonPath("$.message")
-                                    .value("Email must be valid in format, example: tomas@gmail.com"));
+                                    .value("Email must follow pattern elizabeth@gmail.com"));
                 }
 
                 @Test
@@ -289,7 +289,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     var request = UpdateUserHimselfRequest.builder().email("invalid-email.").build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/user/self")
+                    var result = mockMvc.perform(put("/v1/users/self")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -297,7 +297,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     //Assert
                     result.andExpect(status().isBadRequest())
                             .andExpect(jsonPath("$.message")
-                                    .value("Email must be valid in format, example: tomas@gmail.com"));
+                                    .value("Email must follow pattern elizabeth@gmail.com"));
                 }
             }
 
@@ -311,7 +311,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
                     var request = UpdateUserHimselfRequest.builder().password("password").build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/user/self")
+                    var result = mockMvc.perform(put("/v1/users/self")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -328,7 +328,7 @@ public class UserControllerTest extends MockMvcAbstractTest {
         }
     }
 
-    private String createUser(Consumer<User> preconfigure) {
+    private String saveUser(Consumer<User> preconfigure) {
         var user = TestEntityFactory.createUser();
         preconfigure.accept(user);
         return userRepository.save(user).getId();

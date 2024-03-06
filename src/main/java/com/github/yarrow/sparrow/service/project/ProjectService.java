@@ -8,11 +8,11 @@ import java.util.Collection;
 
 public interface ProjectService {
 
-    ProjectResponse createProject(CreateProjectRequest request);
+    ProjectResponse saveProject(CreateProjectRequest request);
 
     Collection<ProjectShortResponse> getUserProjects();
 
-    ProjectResponse getProjectById(String projectId);
+    ProjectResponse getProjectByIdOrKey(String projectIdOrKey);
 
-    ProjectResponse updateProjectById(String projectId, UpdateProjectRequest request);
+    ProjectResponse updateProjectByIdOrKey(String projectId, UpdateProjectRequest request);
 }

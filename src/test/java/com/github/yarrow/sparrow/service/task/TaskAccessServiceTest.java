@@ -28,9 +28,9 @@ public class TaskAccessServiceTest extends MockMvcAbstractTest {
     @WithUserMock
     public void taskIsReturned() {
         //Arrange
-        var projectId = createProject();
+        var projectId = saveProject();
 
-        var expectedTaskId = createTask(t -> {
+        var expectedTaskId = saveTask(t -> {
             t.setProjectId(projectId);
             t.setName("Expected task");
             t.setDescription("Expected task description");
@@ -60,9 +60,9 @@ public class TaskAccessServiceTest extends MockMvcAbstractTest {
     @WithUserMock
     public void securedTaskIsReturned() {
         //Arrange
-        var projectId = createProject();
+        var projectId = saveProject();
 
-        var expectedTaskId = createTask(t -> {
+        var expectedTaskId = saveTask(t -> {
             t.setProjectId(projectId);
             t.setName("Expected task");
             t.setDescription("Expected task description");
@@ -92,14 +92,14 @@ public class TaskAccessServiceTest extends MockMvcAbstractTest {
     @WithUserMock
     public void inaccessibleSecuredTaskLeadsToThrow() {
         var projectId = createInaccessibleProject();
-        var inaccessibleTaskId = createTask(t -> t.setProjectId(projectId));
+        var inaccessibleTaskId = saveTask(t -> t.setProjectId(projectId));
 
         //Act + Assert
         Assertions.assertThatThrownBy(() -> taskAccessService.getPresentOrThrowSecured(inaccessibleTaskId))
                 .isExactlyInstanceOf(ApplicationError.class);
     }
 
-    private String createProject() {
+    private String saveProject() {
         var project = TestEntityFactory.createProject();
         return projectRepository.save(project).getId();
     }
@@ -110,7 +110,7 @@ public class TaskAccessServiceTest extends MockMvcAbstractTest {
         return projectRepository.save(project).getId();
     }
 
-    private String createTask(Consumer<Task> preconfigure) {
+    private String saveTask(Consumer<Task> preconfigure) {
         var task = TestEntityFactory.createTask();
         preconfigure.accept(task);
         return taskRepository.save(task).getId();

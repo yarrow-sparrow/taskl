@@ -16,12 +16,12 @@ public class CreateTaskRequest {
     @NotNull
     String projectId;
 
-    @Size(min = 1, max = 30, message = "{taskl.validation.task.name-length}")
+    @Size(min = 1, max = 30, message = "{taskl.validation.task.name.length}")
     @NotNull
     @Builder.Default
     String name = "New task";
 
-    @Size(min = 1, max = 300, message = "{taskl.validation.task.description-length}")
+    @Size(min = 1, max = 300, message = "{taskl.validation.task.description.length}")
     @NotNull
     @Builder.Default
     String description = "You can fill your description here";

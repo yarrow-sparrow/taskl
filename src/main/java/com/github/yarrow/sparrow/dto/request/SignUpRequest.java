@@ -13,10 +13,10 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class SignUpRequest {
 
-    @Size(min = 1, max = 30, message = "{taskl.validation.user.username-length}")
+    @Size(min = 1, max = 30, message = "{taskl.validation.user.username.length}")
     String username;
-    @Email(regexp = Constants.Regexp.EMAIL_REGEXP, message = "{taskl.validation.user.email-format}")
+    @Email(regexp = Constants.Regexp.EMAIL_REGEXP, message = "{taskl.validation.user.email.pattern}")
     String email;
-    @Pattern(regexp = Constants.Regexp.PASSWORD_REGEXP, message = "{taskl.validation.user.password-requirements}")
+    @Pattern(regexp = Constants.Regexp.PASSWORD_REGEXP, message = "{taskl.validation.user.password.requirements}")
     String password;
 }
