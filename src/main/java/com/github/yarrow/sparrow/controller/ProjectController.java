@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,16 +19,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
-@RequestMapping("/v1/project")
+@RequestMapping("/v1/projects")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ProjectController {
 
     private final ProjectService projectService;
 
     @PostMapping
-    public ProjectResponse createProject(@RequestBody @Valid Optional<CreateProjectRequest> request) {
-        return projectService.createProject(request.orElse(CreateProjectRequest.builder().build()));
+    public ProjectResponse saveProject(@RequestBody @Valid CreateProjectRequest request) {
+        return projectService.saveProject(request);
     }
 
     @GetMapping
@@ -35,16 +37,19 @@ public class ProjectController {
         return projectService.getUserProjects();
     }
 
-    @GetMapping("/{projectId}")
-    public ProjectResponse getProjectById(@PathVariable String projectId) {
-        return projectService.getProjectById(projectId);
+    @GetMapping("/{projectIdOrKey}")
+    public ProjectResponse getProjectByIdOrKey(@PathVariable String projectIdOrKey) {
+        return projectService.getProjectByIdOrKey(projectIdOrKey);
     }
 
-    @PutMapping("/{projectId}")
-    public ProjectResponse updateProjectById(
-            @PathVariable String projectId,
+    @PutMapping("/{projectIdOrKey}")
+    public ProjectResponse updateProjectByIdOrKey(
+            @PathVariable String projectIdOrKey,
             @RequestBody @Valid Optional<UpdateProjectRequest> request
     ) {
-        return projectService.updateProjectById(projectId, request.orElse(UpdateProjectRequest.builder().build()));
+        return projectService.updateProjectByIdOrKey(
+                projectIdOrKey,
+                request.orElse(UpdateProjectRequest.builder().build())
+        );
     }
 }

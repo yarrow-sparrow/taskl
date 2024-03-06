@@ -194,7 +194,7 @@ public class AuthenticationControllerTest extends MockMvcAbstractTest {
                     //Assert
                     result.andExpect(status().isBadRequest())
                             .andExpect(jsonPath("$.message")
-                                    .value("Email must be valid in format, example: tomas@gmail.com"));
+                                    .value("Email must follow pattern elizabeth@gmail.com"));
                 }
 
                 @Test
@@ -215,7 +215,7 @@ public class AuthenticationControllerTest extends MockMvcAbstractTest {
                     //Assert
                     result.andExpect(status().isBadRequest())
                             .andExpect(jsonPath("$.message")
-                                    .value("Email must be valid in format, example: tomas@gmail.com"));
+                                    .value("Email must follow pattern elizabeth@gmail.com"));
                 }
             }
 
@@ -299,7 +299,7 @@ public class AuthenticationControllerTest extends MockMvcAbstractTest {
                 //Assert
                 result.andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.message")
-                                .value("Email must be valid in format, example: tomas@gmail.com"));
+                                .value("Email must follow pattern elizabeth@gmail.com"));
             }
 
             @Test
@@ -319,7 +319,7 @@ public class AuthenticationControllerTest extends MockMvcAbstractTest {
                 //Assert
                 result.andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.message")
-                                .value("Email must be valid in format, example: tomas@gmail.com"));
+                                .value("Email must follow pattern elizabeth@gmail.com"));
             }
         }
     }

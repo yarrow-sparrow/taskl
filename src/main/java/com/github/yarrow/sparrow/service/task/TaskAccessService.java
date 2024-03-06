@@ -38,7 +38,7 @@ public class TaskAccessService extends AbstractAccessService<Task, String, Appli
             tasks.forEach(t -> tasksByProjectId.put(t.getProjectId(), t));
 
             var currentUserId = SecurityUtil.getCurrentUserId();
-            var accessibleProjects = projectRepository.findProjectsByIdInAndMemberUserIdsContains(
+            var accessibleProjects = projectRepository.findAllByIdInAndMemberUserIdsContains(
                     tasksByProjectId.keySet(),
                     currentUserId
             );

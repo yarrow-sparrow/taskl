@@ -10,6 +10,7 @@ import lombok.extern.jackson.Jacksonized;
 public class ProjectShortResponse {
 
     String id;
+    String key;
     String name;
     String description;
 }

@@ -42,7 +42,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         public void taskIsCreated() throws Exception {
             //Arrange
             var mockedUserId = getMockedUserId();
-            var projectId = createProject();
+            var projectId = saveProject();
 
             var request = CreateTaskRequest.builder()
                     .projectId(projectId)
@@ -63,7 +63,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/task")
+            var result = mockMvc.perform(post("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -89,7 +89,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         public void defaultParametersAreApplied() throws Exception {
             //Arrange
             var mockedUserId = getMockedUserId();
-            var projectId = createProject();
+            var projectId = saveProject();
 
             var request = CreateTaskRequest.builder().projectId(projectId).build();
 
@@ -103,7 +103,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/task")
+            var result = mockMvc.perform(post("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -129,7 +129,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         public void taskCouldBeAssignedToUserHimself() throws Exception {
             //Arrange
             var mockedUserId = getMockedUserId();
-            var projectId = createProject();
+            var projectId = saveProject();
 
             var request = CreateTaskRequest.builder()
                     .projectId(projectId)
@@ -137,7 +137,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/task")
+            var result = mockMvc.perform(post("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -154,7 +154,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void taskCouldBeAssignedToOtherUser() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
             var otherUserId = createOtherUser();
 
             var request = CreateTaskRequest.builder()
@@ -163,7 +163,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/task")
+            var result = mockMvc.perform(post("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -185,7 +185,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/task")
+            var result = mockMvc.perform(post("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -205,7 +205,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/task")
+            var result = mockMvc.perform(post("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -219,13 +219,12 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nullInProjectIdLeadsTo400() throws Exception {
             //Arrange
-            @SuppressWarnings("DataFlowIssue")
             var request = CreateTaskRequest.builder()
                     .projectId(null)
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/task")
+            var result = mockMvc.perform(post("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -244,14 +243,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void emptyNameLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .name("")
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -266,14 +265,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void singleCharacterNameLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .name("*")
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -286,14 +285,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameEqualToLimitLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .name(StringUtils.repeat("*", 30))
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -306,14 +305,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameLongerThanLimitLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .name(StringUtils.repeat("*", 31))
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -328,15 +327,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nullInNameLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
-                    @SuppressWarnings("DataFlowIssue")
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .name(null)
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -355,14 +353,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void emptyDescriptionLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .description("")
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -377,14 +375,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void singleCharacterDescriptionLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .description("*")
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -397,14 +395,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void descriptionEqualToLimitLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .description(StringUtils.repeat("*", 300))
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -417,14 +415,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void descriptionLongerThanLimitLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .description(StringUtils.repeat("*", 301))
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -439,15 +437,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nullInDescriptionLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
-                    @SuppressWarnings("DataFlowIssue")
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .description(null)
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -465,14 +462,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void positiveStoryPointsLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .storyPoints(1d)
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -485,14 +482,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void zeroStoryPointsLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .storyPoints(0d)
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -505,14 +502,14 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void negativeStoryPointsLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var request = CreateTaskRequest.builder()
                             .projectId(projectId)
                             .storyPoints(-1d)
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/task")
+                    var result = mockMvc.perform(post("/v1/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -533,7 +530,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void taskListIsReturned() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
 
             createTask(t -> {
                 t.setProjectId(projectId);
@@ -545,7 +542,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
             });
 
             //Act
-            var result = mockMvc.perform(get("/v1/task").param("projectId", projectId)
+            var result = mockMvc.perform(get("/v1/tasks").param("projectId", projectId)
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -559,10 +556,10 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void noTasksLeadsToEmptyCollection() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
 
             //Act
-            var result = mockMvc.perform(get("/v1/task").param("projectId", projectId)
+            var result = mockMvc.perform(get("/v1/tasks").param("projectId", projectId)
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -574,7 +571,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nullInProjectIdLeadsTo400() throws Exception {
             //Act
-            var result = mockMvc.perform(get("/v1/task")
+            var result = mockMvc.perform(get("/v1/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -587,7 +584,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nonexistentProjectLeadsTo404() throws Exception {
             //Act
-            var result = mockMvc.perform(get("/v1/task").param("projectId", RANDOM_UUID)
+            var result = mockMvc.perform(get("/v1/tasks").param("projectId", RANDOM_UUID)
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -603,7 +600,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
             var projectId = createInaccessibleProject();
 
             //Act
-            var result = mockMvc.perform(get("/v1/task").param("projectId", projectId)
+            var result = mockMvc.perform(get("/v1/tasks").param("projectId", projectId)
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -621,7 +618,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         public void taskIsReturned() throws Exception {
             //Arrange
             var mockedUserId = getMockedUserId();
-            var projectId = createProject();
+            var projectId = saveProject();
 
             var expectedTask = Task.builder()
                     .projectId(projectId)
@@ -634,7 +631,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
             var task = taskRepository.save(expectedTask);
 
             //Act
-            var result = mockMvc.perform(get("/v1/task/{taskId}", task.getId())
+            var result = mockMvc.perform(get("/v1/tasks/{taskId}", task.getId())
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -652,7 +649,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nonexistentTaskLeadsTo404() throws Exception {
             //Act
-            var result = mockMvc.perform(get("/v1/task/{taskId}", RANDOM_UUID)
+            var result = mockMvc.perform(get("/v1/tasks/{taskId}", RANDOM_UUID)
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -679,7 +676,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
             var task = taskRepository.save(expectedTask);
 
             //Act
-            var result = mockMvc.perform(get("/v1/task/{taskId}", task.getId())
+            var result = mockMvc.perform(get("/v1/tasks/{taskId}", task.getId())
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -696,7 +693,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void taskIsUpdated() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
             var mockedUserId = getMockedUserId();
             var otherUserId = createOtherUser();
 
@@ -725,7 +722,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+            var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -749,7 +746,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void emptyUpdateMakeNoChanges() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
             var mockedUserId = getMockedUserId();
 
             var taskId = createTask(t -> {
@@ -774,7 +771,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+            var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -801,7 +798,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
             var request = UpdateTaskRequest.builder().build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/task/{taskId}", RANDOM_UUID)
+            var result = mockMvc.perform(put("/v1/tasks/{taskId}", RANDOM_UUID)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -822,7 +819,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
             var request = UpdateTaskRequest.builder().build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+            var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -836,7 +833,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nonexistentAssigneeLeadsTo404() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
             var mockedUserId = getMockedUserId();
 
             var taskId = createTask(t -> {
@@ -849,7 +846,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+            var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -863,7 +860,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void taskAssigneeIsNullified() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
             var mockedUserId = getMockedUserId();
 
             var taskId = createTask(t -> {
@@ -890,7 +887,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+            var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -909,7 +906,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void assigneeIdWithNullifyFlagLeadsTo400() throws Exception {
             //Arrange
-            var projectId = createProject();
+            var projectId = saveProject();
             var mockedUserId = getMockedUserId();
 
             var taskId = createTask(t -> t.setProjectId(projectId));
@@ -920,7 +917,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+            var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -941,7 +938,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void emptyNameLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -949,7 +946,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -964,7 +961,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void singleCharacterNameLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -972,7 +969,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -985,7 +982,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameEqualToLimitLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -993,7 +990,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1006,7 +1003,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameLongerThanLimitLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1014,7 +1011,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1033,7 +1030,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void emptyDescriptionLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1041,7 +1038,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1056,7 +1053,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void singleCharacterDescriptionLeadsTo200() throws Exception {
                     ///Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1064,7 +1061,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1077,7 +1074,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void descriptionEqualToLimitLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1085,7 +1082,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1098,7 +1095,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void descriptionLongerThanLimitLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1106,7 +1103,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1125,7 +1122,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void positiveStoryPointsLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1133,7 +1130,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1146,7 +1143,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void zeroStoryPointsLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1154,7 +1151,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1167,7 +1164,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void negativeStoryPointsLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject();
+                    var projectId = saveProject();
                     var taskId = createTask(t -> t.setProjectId(projectId));
 
                     var request = UpdateTaskRequest.builder()
@@ -1175,7 +1172,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/task/{taskId}", taskId)
+                    var result = mockMvc.perform(put("/v1/tasks/{taskId}", taskId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -1194,7 +1191,7 @@ public class TaskControllerTest extends MockMvcAbstractTest {
         return userRepository.save(anotherUser).getId();
     }
 
-    private String createProject() {
+    private String saveProject() {
         var project = TestEntityFactory.createProject();
         return projectRepository.save(project).getId();
     }

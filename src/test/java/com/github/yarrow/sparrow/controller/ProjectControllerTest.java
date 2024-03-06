@@ -36,110 +36,228 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
 
         @Test
         @WithUserMock
-        public void createProject() throws Exception {
+        public void projectIsCreated() throws Exception {
             //Arrange
             var mockedUserId = getMockedUserId();
-            var otherUserId = createOtherUser();
 
             var request = CreateProjectRequest.builder()
-                    .name("Created project name")
-                    .description("Created project description")
-                    .memberUserIds(List.of(otherUserId))
+                    .name("Create project name")
+                    .key("CREATE")
+                    .description("Create project description")
                     .build();
 
+            var clockTs = getClockTsMillis();
             var expectedProject = Project.builder()
-                    .name("Created project name")
-                    .description("Created project description")
-                    .memberUserIds(List.of(mockedUserId, otherUserId))
+                    .name("Create project name")
+                    .key("CREATE")
+                    .version(0L)
+                    .createdTs(clockTs)
+                    .updatedTs(clockTs)
+                    .description("Create project description")
+                    .memberUserIds(List.of(mockedUserId))
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/project")
+            var result = mockMvc.perform(post("/v1/projects")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
 
             //Assert
             result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name").value("Created project name"))
-                    .andExpect(jsonPath("$.description").value("Created project description"))
-                    // Mocked user is added to the project as a first member
-                    .andExpect(jsonPath("$.memberUsers", hasSize(2)));
-
-            var actualProject = projectRepository.findAll().getFirst();
-            Assertions.assertThat(actualProject)
-                    .usingRecursiveComparison()
-                    .ignoringFields("id", "memberUserIds")
-                    .isEqualTo(expectedProject);
-            Assertions.assertThat(actualProject.getMemberUserIds())
-                    .containsExactlyInAnyOrder(mockedUserId, otherUserId);
-        }
-
-        @Test
-        @WithUserMock
-        public void defaultParametersAreApplied() throws Exception {
-            //Arrange
-            var mockedUserId = getMockedUserId();
-
-            var expectedProject = Project.builder()
-                    .name("New project")
-                    .description("You can fill your description here")
-                    .memberUserIds(List.of(mockedUserId))
-                    .build();
-
-            //Act
-            var result = mockMvc.perform(post("/v1/project")
-                    .contentType(MediaType.APPLICATION_JSON)
-            );
-
-            //Assert
-            result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name").value("New project"))
-                    .andExpect(jsonPath("$.description").value("You can fill your description here"))
-                    .andExpect(jsonPath("$.memberUsers[0].id").value(mockedUserId));
+                    .andExpect(jsonPath("$.name").value("Create project name"))
+                    .andExpect(jsonPath("$.key").value("CREATE"))
+                    //Mocked user is added to the project as a first member
+                    .andExpect(jsonPath("$.memberUsers", hasSize(1)));
 
             var actualProject = projectRepository.findAll().getFirst();
             Assertions.assertThat(actualProject)
                     .usingRecursiveComparison()
                     .ignoringFields("id")
+                    .ignoringCollectionOrder()
                     .isEqualTo(expectedProject);
         }
 
         @Test
         @WithUserMock
-        public void nonexistentUserLeadsTo404() throws Exception {
+        public void keyIsCapitalized() throws Exception {
             //Arrange
-            var request = CreateProjectRequest.builder()
-                    .memberUserIds(List.of(RANDOM_UUID))
+            var request = defaultCreateProjectRequestBuilder()
+                    .key("key")
                     .build();
 
             //Act
-            var result = mockMvc.perform(post("/v1/project")
+            var result = mockMvc.perform(post("/v1/projects")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
 
             //Assert
-            result.andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value("User not found"));
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.key").value("KEY"));
+
+            var actualProject = projectRepository.findAll().getFirst();
+            Assertions.assertThat(actualProject)
+                    .extracting(Project::getKey)
+                    .isEqualTo("KEY");
         }
 
         @Nested
         class Validation {
 
             @Nested
+            class Key {
+
+                @Test
+                @WithUserMock
+                public void nullInKeyLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = defaultCreateProjectRequestBuilder()
+                            .key(null)
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(post("/v1/projects")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Project key must be present"));
+                }
+
+                @Test
+                @WithUserMock
+                public void emptyKeyLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = defaultCreateProjectRequestBuilder()
+                            .key("")
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(post("/v1/projects")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Project key must be between 2 and 20 characters"));
+                }
+
+                @Test
+                @WithUserMock
+                public void twoCharacterNameLeadsTo200() throws Exception {
+                    //Arrange
+                    var request = defaultCreateProjectRequestBuilder()
+                            .name("AB")
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(post("/v1/projects")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isOk());
+                }
+
+                @Test
+                @WithUserMock
+                public void keyEqualToLimitLeadsTo200() throws Exception {
+                    //Arrange
+                    var request = defaultCreateProjectRequestBuilder()
+                            .key(StringUtils.repeat("A", 20))
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(post("/v1/projects")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isOk());
+                }
+
+                @Test
+                @WithUserMock
+                public void keyLongerThanLimitLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = defaultCreateProjectRequestBuilder()
+                            .key(StringUtils.repeat("A", 21))
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(post("/v1/projects")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Project key must be between 2 and 20 characters"));
+                }
+
+                @Test
+                @WithUserMock
+                public void invalidKeyLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = defaultCreateProjectRequestBuilder()
+                            .key("INVALID1")
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(post("/v1/projects")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Project key must consist only of A-Z characters"));
+                }
+            }
+
+            @Nested
             class Name {
+
+                @Test
+                @WithUserMock
+                public void nullInNameLeadsTo400() throws Exception {
+                    //Arrange
+                    var request = defaultCreateProjectRequestBuilder()
+                            .name(null)
+                            .build();
+
+                    //Act
+                    var result = mockMvc.perform(post("/v1/projects")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    );
+
+                    //Assert
+                    result.andExpect(status().isBadRequest())
+                            .andExpect(jsonPath("$.message")
+                                    .value("Project name must be present"));
+                }
 
                 @Test
                 @WithUserMock
                 public void emptyNameLeadsTo400() throws Exception {
                     //Arrange
-                    var request = CreateProjectRequest.builder()
+                    var request = defaultCreateProjectRequestBuilder()
                             .name("")
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/project")
+                    var result = mockMvc.perform(post("/v1/projects")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -154,12 +272,12 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void singleCharacterNameLeadsTo200() throws Exception {
                     //Arrange
-                    var request = CreateProjectRequest.builder()
+                    var request = defaultCreateProjectRequestBuilder()
                             .name("*")
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/project")
+                    var result = mockMvc.perform(post("/v1/projects")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -172,12 +290,12 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameEqualToLimitLeadsTo200() throws Exception {
                     //Arrange
-                    var request = CreateProjectRequest.builder()
+                    var request = defaultCreateProjectRequestBuilder()
                             .name(StringUtils.repeat("*", 30))
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/project")
+                    var result = mockMvc.perform(post("/v1/projects")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -190,12 +308,12 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameLongerThanLimitLeadsTo400() throws Exception {
                     //Arrange
-                    var request = CreateProjectRequest.builder()
+                    var request = defaultCreateProjectRequestBuilder()
                             .name(StringUtils.repeat("*", 31))
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/project")
+                    var result = mockMvc.perform(post("/v1/projects")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -205,18 +323,21 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                             .andExpect(jsonPath("$.message")
                                     .value("Project name must be between 1 and 30 characters"));
                 }
+            }
+
+            @Nested
+            class Description {
 
                 @Test
                 @WithUserMock
-                public void nullInNameLeadsTo400() throws Exception {
+                public void nullInDescriptionLeadsTo400() throws Exception {
                     //Arrange
-                    @SuppressWarnings("DataFlowIssue")
-                    var request = CreateProjectRequest.builder()
-                            .name(null)
+                    var request = defaultCreateProjectRequestBuilder()
+                            .description(null)
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(post("/v1/project")
+                    var result = mockMvc.perform(post("/v1/projects")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -225,106 +346,6 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                     result.andExpect(status().isBadRequest())
                             .andExpect(jsonPath("$.message").value("must not be null"));
                 }
-            }
-
-            @Nested
-            class Description {
-
-                @Test
-                @WithUserMock
-                public void emptyDescriptionLeadsTo400() throws Exception {
-                    //Arrange
-                    var request = CreateProjectRequest.builder()
-                            .description("")
-                            .build();
-
-                    //Act
-                    var result = mockMvc.perform(post("/v1/project")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request))
-                    );
-
-                    //Assert
-                    result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message")
-                                    .value("Project description must be between 1 and 300 characters"));
-                }
-
-                @Test
-                @WithUserMock
-                public void singleCharacterDescriptionLeadsTo200() throws Exception {
-                    //Arrange
-                    var request = CreateProjectRequest.builder()
-                            .description("*")
-                            .build();
-
-                    //Act
-                    var result = mockMvc.perform(post("/v1/project")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request))
-                    );
-
-                    //Assert
-                    result.andExpect(status().isOk());
-                }
-
-                @Test
-                @WithUserMock
-                public void descriptionEqualToLimitLeadsTo200() throws Exception {
-                    //Arrange
-                    var request = CreateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", 300))
-                            .build();
-
-                    //Act
-                    var result = mockMvc.perform(post("/v1/project")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request))
-                    );
-
-                    //Assert
-                    result.andExpect(status().isOk());
-                }
-
-                @Test
-                @WithUserMock
-                public void descriptionLongerThanLimitLeadsTo400() throws Exception {
-                    //Arrange
-                    var request = CreateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", 301))
-                            .build();
-
-                    //Act
-                    var result = mockMvc.perform(post("/v1/project")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request))
-                    );
-
-                    //Assert
-                    result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message")
-                                    .value("Project description must be between 1 and 300 characters"));
-                }
-            }
-
-            @Test
-            @WithUserMock
-            public void nullInDescriptionLeadsTo400() throws Exception {
-                //Arrange
-                @SuppressWarnings("DataFlowIssue")
-                var request = CreateProjectRequest.builder()
-                        .description(null)
-                        .build();
-
-                //Act
-                var result = mockMvc.perform(post("/v1/project")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                );
-
-                //Assert
-                result.andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.message").value("must not be null"));
             }
         }
     }
@@ -336,17 +357,17 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void getProjects() throws Exception {
             //Arrange
-            createProject(p -> p.setName("Project 1"));
-            createProject(p -> p.setName("Project 2"));
+            saveProject(p -> p.setName("Project 1"));
+            saveProject(p -> p.setName("Project 2"));
 
-            var otherUserId = createOtherUser();
-            createProject(p -> {
+            var otherUserId = saveOtherUser();
+            saveProject(p -> {
                 p.setName("Another user's project");
                 p.setMemberUserIds(List.of(otherUserId));
             });
 
             //Act
-            var result = mockMvc.perform(get("/v1/project").contentType(MediaType.APPLICATION_JSON));
+            var result = mockMvc.perform(get("/v1/projects").contentType(MediaType.APPLICATION_JSON));
 
             //Assert
             result.andExpect(status().isOk())
@@ -358,7 +379,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void noProjectsReturnsEmptyCollection() throws Exception {
             //Act
-            var result = mockMvc.perform(get("/v1/project").contentType(MediaType.APPLICATION_JSON));
+            var result = mockMvc.perform(get("/v1/projects").contentType(MediaType.APPLICATION_JSON));
 
             //Assert
             result.andExpect(status().isOk())
@@ -373,11 +394,33 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void getProjectById() throws Exception {
             //Arrange
-            var expectedProjectId = createProject(p -> p.setName("Expected project"));
-            createProject(p -> p.setName("Another project"));
+            var expectedProjectId = saveProject(p -> p.setName("Expected project"));
+            saveProject(p -> p.setName("Another project"));
 
             //Act
-            var result = mockMvc.perform(get("/v1/project/{projectId}", expectedProjectId));
+            var result = mockMvc.perform(get("/v1/projects/{projectId}", expectedProjectId));
+
+            //Assert
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(expectedProjectId))
+                    .andExpect(jsonPath("$.name").value("Expected project"));
+        }
+
+        @Test
+        @WithUserMock
+        public void getProjectByKey() throws Exception {
+            //Arrange
+            var expectedProjectId = saveProject(p -> {
+                p.setKey("EXPECTED");
+                p.setName("Expected project");
+            });
+            saveProject(p -> {
+                p.setKey("ANOTHER");
+                p.setName("Another project");
+            });
+
+            //Act
+            var result = mockMvc.perform(get("/v1/projects/{projectId}", "EXPECTED"));
 
             //Assert
             result.andExpect(status().isOk())
@@ -389,11 +432,10 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nonexistentProjectLeadsTo404() throws Exception {
             //Arrange
-            createProject(p -> p.setName("Project 1"));
-            createProject(p -> p.setName("Project 2"));
+            saveProject(p -> p.setName("Project 1"));
 
             //Act
-            var result = mockMvc.perform(get("/v1/project/{projectId}", RANDOM_UUID));
+            var result = mockMvc.perform(get("/v1/projects/{projectId}", RANDOM_UUID));
 
             //Assert
             result.andExpect(status().isNotFound())
@@ -404,14 +446,14 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void otherUserProjectInaccessibleForGet() throws Exception {
             //Arrange
-            var otherUserId = createOtherUser();
-            var otherUserProjectId = createProject(p -> {
+            var otherUserId = saveOtherUser();
+            var otherUserProjectId = saveProject(p -> {
                 p.setName("Other user's project");
                 p.setMemberUserIds(List.of(otherUserId));
             });
 
             //Act
-            var result = mockMvc.perform(get("/v1/project/{projectId}", otherUserProjectId));
+            var result = mockMvc.perform(get("/v1/projects/{projectId}", otherUserProjectId));
 
             //Assert
             result.andExpect(status().isNotFound())
@@ -426,68 +468,127 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void projectIsUpdated() throws Exception {
             //Arrange
+            var clockTs = getClockTsMillis();
             var mockedUserId = getMockedUserId();
-            var projectId = createProject(p -> {
+            var projectId = saveProject(p -> {
+                p.setKey("UPDATE");
                 p.setName("Initial name");
                 p.setDescription("Initial description");
             });
 
-            var otherUserId = createOtherUser();
-
+            var otherUserId = saveOtherUser();
             var request = UpdateProjectRequest.builder()
-                    .name("New name")
-                    .description("New description")
+                    .name("Update project name")
+                    .description("Update project description")
                     .memberUserIds(List.of(mockedUserId, otherUserId))
                     .build();
 
             var expectedProject = Project.builder()
                     .id(projectId)
-                    .name("New name")
-                    .description("New description")
+                    .key("UPDATE")
+                    .version(1L)
+                    .createdTs(clockTs)
+                    .updatedTs(clockTs)
+                    .name("Update project name")
+                    .description("Update project description")
                     .memberUserIds(List.of(mockedUserId, otherUserId))
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
+            var result = mockMvc.perform(put("/v1/projects/{projectId}", projectId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
 
             //Assert
             result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name").value("New name"))
-                    .andExpect(jsonPath("$.description").value("New description"))
+                    .andExpect(jsonPath("$.name").value("Update project name"))
+                    .andExpect(jsonPath("$.description").value("Update project description"))
                     .andExpect(jsonPath("$.memberUsers", hasSize(2)));
 
             var actualProject = projectRepository.findAll().getFirst();
             Assertions.assertThat(actualProject)
                     .usingRecursiveComparison()
                     .ignoringFields("id")
+                    .ignoringCollectionOrder()
                     .isEqualTo(expectedProject);
+        }
 
-            Assertions.assertThat(actualProject.getMemberUserIds())
-                    .containsExactlyInAnyOrder(mockedUserId, otherUserId);
+        @Test
+        @WithUserMock
+        public void projectIsUpdatedByKey() throws Exception {
+            //Arrange
+            var clockTs = getClockTsMillis();
+            var mockedUserId = getMockedUserId();
+            var projectId = saveProject(p -> {
+                p.setKey("UPDATE");
+                p.setName("Initial name");
+                p.setDescription("Initial description");
+            });
+
+            var otherUserId = saveOtherUser();
+            var request = UpdateProjectRequest.builder()
+                    .name("Update project name")
+                    .description("Update project description")
+                    .memberUserIds(List.of(mockedUserId, otherUserId))
+                    .build();
+
+            var expectedProject = Project.builder()
+                    .id(projectId)
+                    .key("UPDATE")
+                    .version(1L)
+                    .createdTs(clockTs)
+                    .updatedTs(clockTs)
+                    .name("Update project name")
+                    .description("Update project description")
+                    .memberUserIds(List.of(mockedUserId, otherUserId))
+                    .build();
+
+            //Act
+            var result = mockMvc.perform(put("/v1/projects/{projectId}", "UPDATE")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            );
+
+            //Assert
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value("Update project name"))
+                    .andExpect(jsonPath("$.description").value("Update project description"))
+                    .andExpect(jsonPath("$.memberUsers", hasSize(2)));
+
+            var actualProject = projectRepository.findAll().getFirst();
+            Assertions.assertThat(actualProject)
+                    .usingRecursiveComparison()
+                    .ignoringFields("id")
+                    .ignoringCollectionOrder()
+                    .isEqualTo(expectedProject);
         }
 
         @Test
         @WithUserMock
         public void emptyUpdateMakeNoChanges() throws Exception {
             //Arrange
+            var clockTs = getClockTsMillis();
             var mockedUserId = getMockedUserId();
-            var projectId = createProject(p -> {
+            var projectId = saveProject(p -> {
+                p.setKey("UPDATE");
                 p.setName("Initial name");
                 p.setDescription("Initial description");
             });
 
             var expectedProject = Project.builder()
                     .id(projectId)
+                    .key("UPDATE")
+                    .version(1L)
+                    .createdTs(clockTs)
+                    .updatedTs(clockTs)
                     .name("Initial name")
                     .description("Initial description")
                     .memberUserIds(List.of(mockedUserId))
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
+            var result = mockMvc.perform(put("/v1/projects/{projectId}", projectId)
                     .contentType(MediaType.APPLICATION_JSON)
             );
 
@@ -503,13 +604,13 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nonexistentProjectLeadsTo404() throws Exception {
             //Arrange
-            createProject(p -> p.setName("Project 1"));
-            createProject(p -> p.setName("Project 2"));
+            saveProject(p -> p.setName("Project 1"));
+            saveProject(p -> p.setName("Project 2"));
 
             var request = UpdateProjectRequest.builder().build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", RANDOM_UUID)
+            var result = mockMvc.perform(put("/v1/projects/{projectId}", RANDOM_UUID)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -524,14 +625,14 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void nonexistentUserLeadsTo404() throws Exception {
             //Arrange
-            var projectId = createProject(p -> p.setName("Initial name"));
+            var projectId = saveProject(p -> p.setName("Initial name"));
 
             var request = UpdateProjectRequest.builder()
                     .memberUserIds(List.of(RANDOM_UUID))
                     .build();
 
             //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
+            var result = mockMvc.perform(put("/v1/projects/{projectId}", projectId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
             );
@@ -546,14 +647,14 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
         @WithUserMock
         public void otherUserProjectInaccessibleForUpdate() throws Exception {
             //Arrange
-            var otherUserId = createOtherUser();
-            var otherUserProjectId = createProject(p -> {
+            var otherUserId = saveOtherUser();
+            var otherUserProjectId = saveProject(p -> {
                 p.setName("Other user's project");
                 p.setMemberUserIds(List.of(otherUserId));
             });
 
             //Act
-            var result = mockMvc.perform(put("/v1/project/{projectId}", otherUserProjectId));
+            var result = mockMvc.perform(put("/v1/projects/{projectId}", otherUserProjectId));
 
             //Assert
             result.andExpect(status().isNotFound())
@@ -571,7 +672,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void emptyNameLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject(p -> {
+                    var projectId = saveProject(p -> {
                         p.setName("Initial name");
                         p.setDescription("Initial description");
                     });
@@ -581,7 +682,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
+                    var result = mockMvc.perform(put("/v1/projects/{projectId}", projectId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -596,7 +697,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void singleCharacterNameLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject(p -> {
+                    var projectId = saveProject(p -> {
                         p.setName("Initial name");
                         p.setDescription("Initial description");
                     });
@@ -606,7 +707,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
+                    var result = mockMvc.perform(put("/v1/projects/{projectId}", projectId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -619,7 +720,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameEqualToLimitLeadsTo200() throws Exception {
                     //Arrange
-                    var projectId = createProject(p -> {
+                    var projectId = saveProject(p -> {
                         p.setName("Initial name");
                         p.setDescription("Initial description");
                     });
@@ -629,7 +730,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
+                    var result = mockMvc.perform(put("/v1/projects/{projectId}", projectId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -642,7 +743,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                 @WithUserMock
                 public void nameLongerThanLimitLeadsTo400() throws Exception {
                     //Arrange
-                    var projectId = createProject(p -> {
+                    var projectId = saveProject(p -> {
                         p.setName("Initial name");
                         p.setDescription("Initial description");
                     });
@@ -652,7 +753,7 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                             .build();
 
                     //Act
-                    var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
+                    var result = mockMvc.perform(put("/v1/projects/{projectId}", projectId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     );
@@ -663,92 +764,24 @@ public class ProjectControllerTest extends MockMvcAbstractTest {
                                     .value("Project name must be between 1 and 30 characters"));
                 }
             }
-
-            @Nested
-            class Description {
-
-                @Test
-                @WithUserMock
-                public void singleCharacterDescriptionLeadsTo200() throws Exception {
-                    //Arrange
-                    var projectId = createProject(p -> {
-                        p.setName("Initial name");
-                        p.setDescription("Initial description");
-                    });
-
-                    var request = UpdateProjectRequest.builder()
-                            .description("*")
-                            .build();
-
-                    //Act
-                    var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request))
-                    );
-
-                    //Assert
-                    result.andExpect(status().isOk());
-                }
-
-                @Test
-                @WithUserMock
-                public void descriptionEqualToLimitLeadsTo200() throws Exception {
-                    //Arrange
-                    var projectId = createProject(p -> {
-                        p.setName("Initial name");
-                        p.setDescription("Initial description");
-                    });
-
-                    var request = UpdateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", 300))
-                            .build();
-
-                    //Act
-                    var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request))
-                    );
-
-                    //Assert
-                    result.andExpect(status().isOk());
-                }
-
-                @Test
-                @WithUserMock
-                public void descriptionLongerThanLimitLeadsTo400() throws Exception {
-                    //Arrange
-                    var projectId = createProject(p -> {
-                        p.setName("Initial name");
-                        p.setDescription("Initial description");
-                    });
-
-                    var request = UpdateProjectRequest.builder()
-                            .description(StringUtils.repeat("*", 301))
-                            .build();
-
-                    //Act
-                    var result = mockMvc.perform(put("/v1/project/{projectId}", projectId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request))
-                    );
-
-                    //Assert
-                    result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message")
-                                    .value("Project description must be between 1 and 300 characters"));
-                }
-            }
         }
     }
 
-    private String createProject(Consumer<Project> preconfigure) {
+    private CreateProjectRequest.CreateProjectRequestBuilder defaultCreateProjectRequestBuilder() {
+        return CreateProjectRequest.builder()
+                .name("Create project name")
+                .key("CREATE")
+                .description("Create project description");
+    }
+
+    private String saveProject(Consumer<Project> preconfigure) {
         var project = TestEntityFactory.createProject();
         preconfigure.accept(project);
         return projectRepository.save(project).getId();
     }
 
-    private String createOtherUser() {
-        var anotherUser = TestEntityFactory.createUser();
-        return userRepository.save(anotherUser).getId();
+    private String saveOtherUser() {
+        var otherUser = TestEntityFactory.createUser();
+        return userRepository.save(otherUser).getId();
     }
 }

@@ -23,6 +23,8 @@ public class TestEntityFactory {
 
     public static Project createProject() {
         return Project.builder()
+                .key("KEY")
+                .version(null)
                 .name("Test name")
                 .description("Test description")
                 .memberUserIds(List.of(SecurityUtil.getCurrentUserId()))

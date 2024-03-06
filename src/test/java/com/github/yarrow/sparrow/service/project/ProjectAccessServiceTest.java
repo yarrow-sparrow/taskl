@@ -24,14 +24,19 @@ public class ProjectAccessServiceTest extends MockMvcAbstractTest {
     @WithUserMock
     public void projectIsReturned() {
         //Arrange
-        var expectedProjectId = createProject(p -> {
+        var expectedProjectId = saveProject(p -> {
             p.setName("Expected project name");
             p.setDescription("Expected project description");
             p.setMemberUserIds(List.of(getMockedUserId()));
         });
 
+        var clockTs = getClockTsMillis();
         var expectedProject = Project.builder()
                 .id(expectedProjectId)
+                .key("KEY")
+                .version(0L)
+                .createdTs(clockTs)
+                .updatedTs(clockTs)
                 .name("Expected project name")
                 .description("Expected project description")
                 .memberUserIds(List.of(getMockedUserId()))
@@ -47,16 +52,52 @@ public class ProjectAccessServiceTest extends MockMvcAbstractTest {
 
     @Test
     @WithUserMock
-    public void securedProjectIsReturned() {
+    public void projectIsReturnedByKey() {
         //Arrange
-        var expectedProjectId = createProject(p -> {
+        var expectedProjectId = saveProject(p -> {
+            p.setKey("KEY");
             p.setName("Expected project name");
             p.setDescription("Expected project description");
             p.setMemberUserIds(List.of(getMockedUserId()));
         });
 
+        var clockTs = getClockTsMillis();
         var expectedProject = Project.builder()
                 .id(expectedProjectId)
+                .key("KEY")
+                .version(0L)
+                .createdTs(clockTs)
+                .updatedTs(clockTs)
+                .name("Expected project name")
+                .description("Expected project description")
+                .memberUserIds(List.of(getMockedUserId()))
+                .build();
+
+        //Act
+        var actualProject = projectAccessService.getPresentOrThrow("KEY");
+
+        //Arrange
+        Assertions.assertThat(actualProject)
+                .isEqualTo(expectedProject);
+    }
+
+    @Test
+    @WithUserMock
+    public void securedProjectIsReturned() {
+        //Arrange
+        var expectedProjectId = saveProject(p -> {
+            p.setName("Expected project name");
+            p.setDescription("Expected project description");
+            p.setMemberUserIds(List.of(getMockedUserId()));
+        });
+
+        var clockTs = getClockTsMillis();
+        var expectedProject = Project.builder()
+                .id(expectedProjectId)
+                .key("KEY")
+                .version(0L)
+                .createdTs(clockTs)
+                .updatedTs(clockTs)
                 .name("Expected project name")
                 .description("Expected project description")
                 .memberUserIds(List.of(getMockedUserId()))
@@ -72,9 +113,40 @@ public class ProjectAccessServiceTest extends MockMvcAbstractTest {
 
     @Test
     @WithUserMock
+    public void securedProjectIsReturnedByKey() {
+        //Arrange
+        var expectedProjectId = saveProject(p -> {
+            p.setKey("KEY");
+            p.setName("Expected project name");
+            p.setDescription("Expected project description");
+            p.setMemberUserIds(List.of(getMockedUserId()));
+        });
+
+        var clockTs = getClockTsMillis();
+        var expectedProject = Project.builder()
+                .id(expectedProjectId)
+                .key("KEY")
+                .version(0L)
+                .createdTs(clockTs)
+                .updatedTs(clockTs)
+                .name("Expected project name")
+                .description("Expected project description")
+                .memberUserIds(List.of(getMockedUserId()))
+                .build();
+
+        //Act
+        var actualProject = projectAccessService.getPresentOrThrowSecured("KEY");
+
+        //Arrange
+        Assertions.assertThat(actualProject)
+                .isEqualTo(expectedProject);
+    }
+
+    @Test
+    @WithUserMock
     public void inaccessibleSecuredProjectLeadsToThrow() {
         //Arrange
-        var inaccessibleProjectId = createProject(p -> {
+        var inaccessibleProjectId = saveProject(p -> {
             p.setName("Expected project name");
             p.setDescription("Expected project description");
             p.setMemberUserIds(List.of(RANDOM_UUID));
@@ -85,7 +157,23 @@ public class ProjectAccessServiceTest extends MockMvcAbstractTest {
                         .isExactlyInstanceOf(ApplicationError.class);
     }
 
-    private String createProject(Consumer<Project> preconfigure) {
+    @Test
+    @WithUserMock
+    public void inaccessibleByKeySecuredProjectLeadsToThrow() {
+        //Arrange
+        saveProject(p -> {
+            p.setKey("KEY");
+            p.setName("Expected project name");
+            p.setDescription("Expected project description");
+            p.setMemberUserIds(List.of(RANDOM_UUID));
+        });
+
+        //Act + Assert
+        Assertions.assertThatThrownBy(() -> projectAccessService.getPresentOrThrowSecured("KEY"))
+                .isExactlyInstanceOf(ApplicationError.class);
+    }
+
+    private String saveProject(Consumer<Project> preconfigure) {
         var project = TestEntityFactory.createProject();
         preconfigure.accept(project);
         return projectRepository.save(project).getId();
