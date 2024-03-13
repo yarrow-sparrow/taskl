@@ -1,4 +1,4 @@
-package com.github.yarrow.sparrow.controller;
+package com.github.yarrow.sparrow.api;
 
 import com.github.yarrow.sparrow.dto.request.CreateProjectRequest;
 import com.github.yarrow.sparrow.dto.request.UpdateProjectRequest;

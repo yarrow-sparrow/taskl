@@ -1,0 +1,48 @@
+components:
+  schemas:
+    SignUpRequest:
+      type: object
+      properties:
+        username:
+          description: Displayed username
+          type: string
+          nullable: false
+        email:
+          description: Email
+          type: string
+          nullable: false
+          format: email
+        password:
+          description: Password
+          type: string
+          nullable: false
+          pattern: '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$'
+          x-pattern-message: Password must have minimum eight characters, at least one upper case English letter, one lower case English letter, one number and one special character
+      required:
+        - username
+        - email
+        - password
+    SignInRequest:
+      type: object
+      properties:
+        email:
+          description: Email
+          type: string
+          nullable: false
+        password:
+          description: Password
+          type: string
+          nullable: false
+      required:
+        - email
+        - password
+    AuthenticationResponse:
+      type: object
+      properties:
+        token:
+          description: JWT encoded token
+          type: string
+          format: JWT
+          nullable: false
+      required:
+        - token

@@ -1,0 +1,12 @@
+get:
+  summary: Ping
+  operationId: ping
+  tags:
+    - Health
+  responses:
+    200:
+      description: Pong
+      content:
+        text/plain:
+          schema:
+            type: string

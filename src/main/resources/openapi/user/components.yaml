@@ -1,0 +1,46 @@
+components:
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        id:
+          description: Identifier
+          type: string
+          nullable: false
+        email:
+          description: Email
+          type: string
+          nullable: false
+        username:
+          description: Name
+          type: string
+          nullable: false
+        initials:
+          description: First and second username characters in capital case
+          type: string
+          nullable: false
+          examples:
+            - PA
+        phoneNumber:
+          description: Phone number
+          type: string
+          nullable: true
+      required:
+        - id
+        - username
+        - initials
+        - email
+
+    UpdateUserHimselfRequest:
+      type: object
+      properties:
+        username:
+          description: Displayed username
+          type: string
+          nullable: false
+        phoneNumber:
+          description: Phone number
+          type: string
+          nullable: true
+      required:
+        - username

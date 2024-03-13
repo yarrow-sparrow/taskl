@@ -1,0 +1,22 @@
+post:
+  tags:
+    - Auth
+  summary: Login new user
+  operationId: signIn
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: 'components.yaml#/components/schemas/SignInRequest'
+    required: true
+  responses:
+    200:
+      description: User logged in
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/AuthenticationResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'

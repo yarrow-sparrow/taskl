@@ -1,4 +1,4 @@
-package com.github.yarrow.sparrow.controller;
+package com.github.yarrow.sparrow.api;
 
 import com.github.yarrow.sparrow.dto.request.CreateTaskRequest;
 import com.github.yarrow.sparrow.dto.request.UpdateTaskRequest;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+//TODO: refactor a lot
 @Validated
 @RestController
 @RequestMapping("/v1/tasks")

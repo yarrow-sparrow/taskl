@@ -1,13 +1,27 @@
 plugins {
-    id 'java-library'
+    id 'java'
     id 'idea'
     id 'application'
     id 'org.springframework.boot' version '3.2.3'
     id 'io.spring.dependency-management' version '1.1.4'
+    id "org.openapi.generator" version "7.3.0"
 }
 
 group = 'com.github.yarrow.sparrow'
 version = '0.0.1-SNAPSHOT'
+
+sourceSets {
+    main {
+        java {
+            srcDir layout.buildDirectory.dir("generated/src/main/java").get().asFile.path
+        }
+    }
+    test {
+        java {
+            srcDir layout.buildDirectory.dir("generated/src/main/java").get().asFile.path
+        }
+    }
+}
 
 java {
     toolchain {
@@ -40,6 +54,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
 
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.3.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
     implementation 'io.jsonwebtoken:jjwt-api:' + jsonWebTokenVersion
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:' + jsonWebTokenVersion
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:' + jsonWebTokenVersion
@@ -54,9 +72,6 @@ dependencies {
     implementation 'com.google.guava:guava:32.1.3-jre'
     implementation 'com.github.spullara.mustache.java:compiler:0.9.11'
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.3.0'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-
     implementation 'com.github.f4b6a3:uuid-creator:5.3.3'
     implementation 'io.github.classgraph:classgraph:4.8.165'
 
@@ -70,11 +85,36 @@ dependencies {
 
 application {
     //noinspection GrUnresolvedAccess
-    mainClassName 'com.github.yarrow.sparrow.TasklApplication'
+    mainClassName group.toString() + '.OpenApiGeneratorApplication'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add("-parameters")
+}
+
+/**
+ * https://marco.dev/spring-boot-openapi-generator
+ * https://openapi-generator.tech/docs/generators/spring
+ */
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set(layout.projectDirectory.file("src/main/resources/openapi/api.yaml").asFile.path)
+    outputDir.set(layout.buildDirectory.dir("generated").get().asFile.path)
+    apiPackage.set(group.toString() + ".generated.api")
+    invokerPackage.set(group.toString())
+    modelPackage.set(group.toString() + ".generated.model")
+    configOptions.set([
+            useSpringBoot3: "true",
+            delegatePattern: "true",
+            useTags: "true",
+            unhandledException: "true",
+            useBeanValidation: "true",
+            performBeanValidation: "true",
+            serializableModel: "true",
+    ])
+}
+tasks.compileJava {
+    dependsOn("openApiGenerate")
 }
 
 test {
@@ -84,6 +124,6 @@ test {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'com.github.yarrow.sparrow.TasklApplication'
+        attributes 'Main-Class': group.toString() + '.OpenApiGeneratorApplication'
     }
 }

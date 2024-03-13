@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class SignInResponse {
+public class SignInResponseDeprecated {
 
     String token;
 }

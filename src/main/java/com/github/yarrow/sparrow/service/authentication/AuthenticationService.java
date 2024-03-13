@@ -1,10 +1,10 @@
 package com.github.yarrow.sparrow.service.authentication;
 
 import com.github.yarrow.sparrow.domain.User;
-import com.github.yarrow.sparrow.dto.request.SignInRequest;
-import com.github.yarrow.sparrow.dto.request.SignUpRequest;
-import com.github.yarrow.sparrow.dto.response.SignInResponse;
 import com.github.yarrow.sparrow.exception.ErrorFactory;
+import com.github.yarrow.sparrow.generated.model.SignIn200Response;
+import com.github.yarrow.sparrow.generated.model.SignInRequest;
+import com.github.yarrow.sparrow.generated.model.SignUpRequest;
 import com.github.yarrow.sparrow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
-    public SignInResponse signIn(SignInRequest request) {
+    public SignIn200Response signIn(SignInRequest request) {
         var email = request.getEmail();
         var password = request.getPassword();
 
@@ -51,9 +51,7 @@ public class AuthenticationService {
         authenticationManager.authenticate(authenticationToken(email, password));
         var jwt = jwtService.generateToken(user);
 
-        return SignInResponse.builder()
-                .token(jwt)
-                .build();
+        return new SignIn200Response().token(jwt);
     }
 
     private UsernamePasswordAuthenticationToken authenticationToken(String email, String password) {

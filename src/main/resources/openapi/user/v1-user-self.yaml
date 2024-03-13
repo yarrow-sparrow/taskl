@@ -1,0 +1,43 @@
+get:
+  tags:
+    - User
+  summary: Get user himself
+  operationId: getUserHimself
+  responses:
+    200:
+      description: User is returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/UserResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]
+
+put:
+  tags:
+    - User
+  summary: Update user himself
+  operationId: updateUserHimself
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: 'components.yaml#/components/schemas/UpdateUserHimselfRequest'
+    required: true
+  responses:
+    200:
+      description: User is updated himself
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/UserResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]

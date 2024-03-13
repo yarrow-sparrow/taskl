@@ -1,0 +1,86 @@
+components:
+  schemas:
+    CreateProjectRequest:
+      type: object
+      properties:
+        name:
+          description: Displayed name
+          type: string
+          nullable: true
+        description:
+          description: Description
+          type: string
+          nullable: true
+        memberUserIds:
+          type: array
+          description: Member user ids
+          items:
+            type: string
+          nullable: true
+    ProjectResponse:
+      type: object
+      properties:
+        id:
+          description: Id
+          type: string
+          nullable: false
+        name:
+          description: Displayed name
+          type: string
+          nullable: false
+        description:
+          description: Description
+          type: string
+          nullable: false
+        memberUserIds:
+          type: array
+          description: Member user ids
+          items:
+            type: string
+          nullable: false
+      required:
+        - id
+        - name
+        - description
+        - memberUserIds
+    ProjectShortResponse:
+      type: object
+      description: Project response without member user ids
+      properties:
+        id:
+          description: Id
+          type: string
+          nullable: false
+        name:
+          description: Displayed name
+          type: string
+          nullable: false
+        description:
+          description: Description
+          type: string
+          nullable: false
+      required:
+        - id
+        - name
+        - description
+    ProjectShortResponseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProjectShortResponse'
+    UpdateProjectRequest:
+      type: object
+      properties:
+        name:
+          description: Displayed name
+          type: string
+          nullable: true
+        description:
+          description: Description
+          type: string
+          nullable: true
+        memberUserIds:
+          type: array
+          description: Member user ids
+          items:
+            type: string
+          nullable: true

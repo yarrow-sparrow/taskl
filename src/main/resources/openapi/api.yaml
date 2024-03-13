@@ -1,0 +1,48 @@
+openapi: 3.1.0
+info:
+  title: Taskl API
+  description: Task manager API
+  version: LATEST
+servers:
+  - url: http://localhost:8080/api/
+tags:
+  - name: Auth
+    description: Authentication API
+  - name: User
+    description: User API
+  - name: Project
+    description: Project API
+  - name: Task
+    description: Task API
+  - name: Health
+    description: Application health-related API
+paths:
+#Ping
+  /ping:
+    $ref: 'ping/ping.yaml'
+#Auth
+  /v1/auth/sign-up:
+    $ref: 'auth/v1-auth-sign-up.yaml'
+  /v1/auth/sign-in:
+    $ref: 'auth/v1-auth-sign-in.yaml'
+#Users
+  /v1/users/self:
+    $ref: 'user/v1-user-self.yaml'
+  /v1/users/{userId}:
+    $ref: 'user/v1-user-userId.yaml'
+#Projects
+  /v1/projects:
+    $ref: 'project/v1-project.yaml'
+  /v1/projects/{projectId}:
+    $ref: 'project/v1-project-projectId.yaml'
+#Tasks
+  /v1/tasks:
+    $ref: 'task/v1-task.yaml'
+  /v1/tasks/{taskId}:
+    $ref: 'task/v1-task-taskId.yaml'
+components:
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,7 +1,7 @@
 package com.github.yarrow.sparrow.local;
 
-import com.github.yarrow.sparrow.dto.request.SignInRequest;
-import com.github.yarrow.sparrow.dto.request.SignUpRequest;
+import com.github.yarrow.sparrow.generated.model.SignInRequest;
+import com.github.yarrow.sparrow.generated.model.SignUpRequest;
 import com.github.yarrow.sparrow.repository.UserRepository;
 import com.github.yarrow.sparrow.service.authentication.AuthenticationService;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
+ * TODO: UserDetailsServiceAutoConfiguration
+ * Using generated security password: 4273114b-042b-4165-8018-7b3bd7e5de06
+ * This generated password is for development use only. Your security configuration must be updated before running your application in production.
+ * _
  * Initializer for easier access to protected endpoints
  * Creates user and prints its token to logs
  */
@@ -31,11 +35,11 @@ public class LocalDevelopmentInitializer {
         var email = "local@development.com";
 
         if (!userRepository.existsUserByEmail(email)) {
-            var request = SignUpRequest.builder().username(username).email(email).password(password).build();
+            var request = new SignUpRequest().username(username).email(email).password(password);
             authenticationService.signUp(request);
         }
 
-        var request = SignInRequest.builder().email(email).password(password).build();
+        var request = new SignInRequest().email(email).password(password);
         var token = authenticationService.signIn(request);
 
         log.info("Token for local start-up: {}", token.getToken());

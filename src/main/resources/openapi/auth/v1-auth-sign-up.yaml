@@ -1,0 +1,18 @@
+post:
+  tags:
+    - Auth
+  summary: Register new user
+  operationId: signUp
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: 'components.yaml#/components/schemas/SignUpRequest'
+    required: true
+  responses:
+    200:
+      description: User successfully registered
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'

@@ -1,0 +1,30 @@
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          description: Error code
+          type: string
+        httpStatus:
+          description: HTTP status code, must be the same as response code
+          type: integer
+        description:
+          description: Short description
+          type: string
+        message:
+          description: Human-readable message
+          type: string
+      required:
+        - code
+        - httpStatus
+        - description
+        - message
+
+  responses:
+    ErrorResponse:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

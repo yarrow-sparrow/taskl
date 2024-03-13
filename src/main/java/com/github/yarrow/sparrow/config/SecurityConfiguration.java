@@ -35,12 +35,14 @@ public class SecurityConfiguration {
             UserDetailsService userDetailsService,
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) throws Exception {
+        //TODO: double-check it, allow only on local start-up
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 //Auth
                                 "/v1/auth/**", "/ping",
                                 //OpenAPI UI
+                                "/favicon.ico",
                                 "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml"
                         ).permitAll()
                         .anyRequest().authenticated()

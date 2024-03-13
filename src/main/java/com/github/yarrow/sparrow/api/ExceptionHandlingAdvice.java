@@ -1,4 +1,4 @@
-package com.github.yarrow.sparrow.controller;
+package com.github.yarrow.sparrow.api;
 
 import com.github.yarrow.sparrow.dto.response.ErrorResponse;
 import com.github.yarrow.sparrow.exception.ApplicationError;

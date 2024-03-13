@@ -1,0 +1,55 @@
+get:
+  tags:
+    - Project
+  summary: Get project by id
+  operationId: getProjectById
+  parameters:
+    - in: path
+      name: projectId
+      schema:
+        type: string
+      required: true
+  responses:
+    200:
+      description: Project is returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/ProjectResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]
+
+put:
+  tags:
+    - Project
+  summary: Update project by id
+  operationId: updateProjectById
+  parameters:
+    - in: path
+      name: projectId
+      schema:
+        type: string
+      required: true
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: 'components.yaml#/components/schemas/UpdateProjectRequest'
+    required: false
+  responses:
+    200:
+      description: Project is returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/ProjectResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]

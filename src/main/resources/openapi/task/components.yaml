@@ -1,0 +1,98 @@
+components:
+  schemas:
+    TaskStatus:
+      description: Task status
+      type: string
+      enum:
+        - BACKLOG
+        - IN_PROGRESS
+        - REVIEW
+        - DONE
+    CreateTaskRequest:
+      type: object
+      properties:
+        projectId:
+          description: Project id to create task within
+          type: string
+          nullable: false
+        name:
+          description: Displayed name
+          type: string
+          nullable: true
+        description:
+          description: Description
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+          nullable: true
+        assigneeUserId:
+          description: Task's assignee
+          type: string
+          nullable: true
+        storyPoints:
+          description: Story points
+          type: number
+          minimum: 0
+          nullable: true
+      required:
+        - projectId
+    TaskResponse:
+      type: object
+      properties:
+        projectId:
+          description: Project id to create task within
+          type: string
+          nullable: false
+        name:
+          description: Displayed name
+          type: string
+          nullable: false
+        description:
+          description: Description
+          type: string
+          nullable: false
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+          nullable: false
+        assigneeUserId:
+          description: Task's assignee
+          type: string
+          nullable: true
+        storyPoints:
+          description: Story points
+          type: number
+          minimum: 0
+          nullable: false
+    TaskResponseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TaskResponse'
+    UpdateTaskRequest:
+      description: Update task request, null field leads to no update
+      type: object
+      properties:
+        name:
+          description: Displayed name
+          type: string
+          nullable: true
+        description:
+          description: Description
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+          nullable: true
+        assigneeUserId:
+          description: Task's assignee
+          type: string
+          nullable: true
+        nullifyAssigneeUserId:
+          description: If true, nullifies assignee user id
+          type: boolean
+          nullable: true
+        storyPoints:
+          description: Story points
+          type: number
+          minimum: 0
+          nullable: true

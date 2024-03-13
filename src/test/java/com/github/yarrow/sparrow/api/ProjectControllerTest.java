@@ -1,4 +1,4 @@
-package com.github.yarrow.sparrow.controller;
+package com.github.yarrow.sparrow.api;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

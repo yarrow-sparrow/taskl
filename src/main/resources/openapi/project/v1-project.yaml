@@ -1,0 +1,44 @@
+post:
+  tags:
+    - Project
+  summary: Create project
+  operationId: createProject
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: 'components.yaml#/components/schemas/CreateProjectRequest'
+    required: false
+    description: If no body is passed or some fields are missing, project is initialized with default ones
+  responses:
+    200:
+      description: Project is created
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/ProjectResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]
+
+get:
+  tags:
+    - Project
+  summary: Get user's projects
+  operationId: getUserProjects
+  responses:
+    200:
+      description: User projects are returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/ProjectShortResponseList'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]

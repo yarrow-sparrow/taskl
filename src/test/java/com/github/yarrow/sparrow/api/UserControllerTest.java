@@ -1,4 +1,4 @@
-package com.github.yarrow.sparrow.controller;
+package com.github.yarrow.sparrow.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -8,8 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.github.yarrow.sparrow.MockMvcAbstractTest;
 import com.github.yarrow.sparrow.authentication.WithUserMock;
 import com.github.yarrow.sparrow.domain.User;
-import com.github.yarrow.sparrow.dto.request.SignUpRequest;
 import com.github.yarrow.sparrow.dto.request.UpdateUserHimselfRequest;
+import com.github.yarrow.sparrow.generated.model.SignUpRequest;
 import com.github.yarrow.sparrow.repository.UserRepository;
 import com.github.yarrow.sparrow.util.TestEntityFactory;
 import java.util.function.Consumer;
@@ -162,9 +162,8 @@ public class UserControllerTest extends MockMvcAbstractTest {
         public void alreadyUsedEmailLeadsTo409() throws Exception {
             //Arrange
             saveUser(u -> u.setEmail("new@email.com"));
-            var request = SignUpRequest.builder()
-                    .email("new@email.com")
-                    .build();
+            var request = new SignUpRequest()
+                    .email("new@email.com");
 
             //Act
             var result = mockMvc.perform(put("/v1/users/self")

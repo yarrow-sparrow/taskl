@@ -1,0 +1,55 @@
+get:
+  tags:
+    - Task
+  summary: Get task by id
+  operationId: getTaskById
+  parameters:
+    - in: path
+      name: taskId
+      schema:
+        type: string
+      required: true
+  responses:
+    200:
+      description: Task is returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/TaskResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]
+
+put:
+  tags:
+    - Task
+  summary: Update task by id
+  operationId: updateTaskById
+  parameters:
+    - in: path
+      name: taskId
+      schema:
+        type: string
+      required: true
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: 'components.yaml#/components/schemas/UpdateTaskRequest'
+    required: false
+  responses:
+    200:
+      description: Task is returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/TaskResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]

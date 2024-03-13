@@ -1,0 +1,24 @@
+get:
+  tags:
+    - User
+  summary: Get user by id
+  operationId: getUserById
+  parameters:
+    - in: path
+      name: userId
+      schema:
+        type: string
+      required: true
+  responses:
+    200:
+      description: Task is returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/UserResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]

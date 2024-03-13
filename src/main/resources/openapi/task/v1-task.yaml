@@ -1,0 +1,50 @@
+post:
+  tags:
+    - Task
+  summary: Create task
+  operationId: createTask
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: 'components.yaml#/components/schemas/CreateTaskRequest'
+    required: false
+    description: If no body is passed or some fields are missing, task is initialized with default ones
+  responses:
+    200:
+      description: Task is created
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/TaskResponse'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]
+
+get:
+  tags:
+    - Task
+  summary: Get task by project id
+  operationId: getTaskByProjectId
+  parameters:
+    - in: query
+      name: projectId
+      schema:
+        type: string
+      required: true
+  responses:
+    200:
+      description: Project tasks are returned
+      content:
+        application/json:
+          schema:
+            $ref: 'components.yaml#/components/schemas/TaskResponseList'
+    4xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+    5xx:
+      $ref: '../common.yaml#/components/responses/ErrorResponse'
+  security:
+    - BearerToken: [ ]
